@@ -426,7 +426,7 @@ h1,h2,h3{margin:0;}
 /* ============================================================
  * 설정: 배포된 GAS 웹앱 URL / Google OAuth Client ID를 입력하세요.
  * ============================================================ */
-const GAS_API_URL = 'https://script.google.com/macros/s/[YOUR_DEPLOYMENT_ID]/exec';
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbxi29RPRkGMDpqnD7q7jwSWS7LVELHOycH4KGH07nufX5ftZa7PqGvgCu5_3Qdla3uRNA/exec';
 const GOOGLE_CLIENT_ID = '633540743274-3irl57ce0ossakshumkj2limilqk6asj.apps.googleusercontent.com';
 
 // 캘린더 태그 컬러: 채도를 낮춘 톤온톤 팔레트 (포인트 레드와 겹치지 않도록 레드 계열 제외)
@@ -866,8 +866,21 @@ async function enterWriteDepth2(teamId) {
   document.getElementById('writeTeamTitle').textContent = team.team_name + ' 작성';
 
   await loadTeamCalendar(teamId);
-  await loadEditor(teamId);
-  startAutosave();
+  try {
+    await loadEditor(teamId);
+    startAutosave();
+  } catch (err) {
+    // Quill 에디터 라이브러리 로드 실패 시 (네트워크/방화벽으로 CDN 차단 등)
+    // 알아보기 힘든 오류 대신 안내 문구를 보여주고, 저장/작성 버튼을 비활성화합니다.
+    document.getElementById('editorWrap').innerHTML =
+      '<div style="padding:24px; font-size:13px; color:var(--accent);">' +
+      '⚠️ 글쓰기 도구를 불러오지 못했습니다. 인터넷 연결 상태를 확인하거나, 회사 네트워크가 외부 스크립트(cdnjs.cloudflare.com)를 차단하고 있는지 확인해주세요.<br>' +
+      '페이지를 새로고침한 뒤 다시 시도해주시고, 계속 안 되면 관리자에게 문의해주세요.</div>';
+    ['btnSave','btnLoadPrev','btnInsertTable','btnTemplate','btnOtherTeams'].forEach(id => {
+      const el = document.getElementById(id);
+      el.disabled = true; el.style.opacity = .5;
+    });
+  }
 }
 document.getElementById('btnBackToTeams').onclick = () => { stopAutosave(); showWriteDepth1(); };
 
@@ -941,6 +954,7 @@ function setStatusBadge(status) {
   badge.textContent = label; badge.className = 'badge ' + cls;
 }
 document.getElementById('btnSave').onclick = async () => {
+  if (!STATE.quill) { alert('에디터를 불러오지 못한 상태입니다. 페이지를 새로고침한 뒤 다시 시도해주세요.'); return; }
   try {
     const record = await api('saveWeekData', { weekId: STATE.currentWeekId, teamId: STATE.writeTeamId,
       contentHtml: STATE.quill.root.innerHTML, status:'submitted' });
