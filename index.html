@@ -3,805 +3,1200 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weekly 위클리 회의 자료</title>
+<title>CSES Weekly 회의자료 취합</title>
+
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
+<!-- 표(Table) 삽입: Quill 기본 모듈엔 없어서 별도 확장 플러그인을 추가로 불러옵니다 -->
+<link href="https://cdn.jsdelivr.net/npm/quill-better-table@1.2.10/dist/quill-better-table.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill-better-table@1.2.10/dist/quill-better-table.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.11/index.global.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/6.1.11/index.global.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
 <style>
+/* ===================== CSES CI 토큰 (딥레드 + 무채색, 각진 레이아웃) ===================== */
 :root{
-  --primary:#0075de;
-  --primary-active:#005bab;
-  --secondary:#213183;
-  --on-primary:#ffffff;
-  --canvas:#ffffff;
-  --canvas-soft:#f6f5f4;
-  --surface:#ffffff;
-  --ink:#000000;
-  --ink-secondary:#31302e;
-  --ink-muted:#615d59;
-  --ink-faint:#a39e98;
-  --hairline:#e6e6e6;
-  --accent-sky:#62aef0;
-  --accent-purple:#d6b6f6;
-  --accent-purple-deep:#391c57;
-  --accent-pink:#ff64c8;
-  --accent-orange:#dd5b00;
-  --accent-orange-deep:#793400;
-  --accent-teal:#2a9d99;
-  --accent-green:#1aae39;
-  --accent-brown:#523410;
-
-  --r-xs:4px; --r-sm:5px; --r-md:8px; --r-lg:12px; --r-xl:16px; --r-full:9999px;
-  --sp-xxs:4px; --sp-xs:8px; --sp-sm:12px; --sp-md:16px; --sp-lg:24px; --sp-xl:28px; --sp-xxl:32px;
-
-  --shadow-1: 0 0.175px 1.041px rgba(0,0,0,0.01), 0 0.8px 2.925px rgba(0,0,0,0.02), 0 2.025px 7.847px rgba(0,0,0,0.027), 0 4px 18px rgba(0,0,0,0.04);
-  --shadow-2: 0 1px 2px rgba(0,0,0,0.03), 0 4px 10px rgba(0,0,0,0.04), 0 12px 24px rgba(0,0,0,0.04), 0 23px 52px rgba(0,0,0,0.05);
+  --accent:#c6222b; --accent-dark:#9c1a20; --accent-tint:#fbeceb;
+  --sun:#c6222b; --sat:#3467a8; --today:#fff3b0; --today-border:#e0c34a;
+  --ink:#111113; --gray-text:#333336; --gray-sub:#83838a; --gray-line:#e7e7e9; --gray-light:#f6f6f7; --white:#ffffff;
+  --shadow:0 1px 2px rgba(0,0,0,.04);
 }
-
 *{box-sizing:border-box;}
-html,body{margin:0;padding:0;}
-body{
-  background:var(--canvas-soft);
-  color:var(--ink);
-  font-family:Inter,-apple-system,system-ui,"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",Helvetica,Arial,sans-serif;
-  font-size:16px;
-  line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-}
+html,body{margin:0;padding:0;height:100%;}
+body{font-family:'Pretendard',-apple-system,sans-serif; letter-spacing:-0.2px; line-height:1.55; color:var(--gray-text); background:var(--white);}
+button{font-family:inherit;letter-spacing:-0.2px;cursor:pointer;border:none;border-radius:0;}
+a{color:inherit;text-decoration:none;}
+h1,h2,h3{margin:0;}
 
-.page{max-width:1300px;margin:0 auto;}
+/* ===================== 로그인 화면 ===================== */
+#loginScreen{height:100vh; display:flex; align-items:center; justify-content:center; background:var(--white);}
+.login-card{position:relative;background:var(--white);padding:48px 44px;width:380px;text-align:center;border:1px solid var(--gray-line);}
+.brand-logo{width:56px;height:56px;background:var(--accent);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;margin:0 auto 12px;letter-spacing:.02em;}
+.brand-kr-sub{font-size:11px;color:var(--gray-sub);letter-spacing:.04em;margin-bottom:20px;}
+.login-card h1{font-size:17px;margin:0 0 4px;font-weight:800;}
+.login-card p{font-size:13px;color:var(--gray-sub);margin:0 0 26px;}
+#googleSignInBtn{display:flex;justify-content:center;}
+.login-error{color:var(--accent);font-size:12.5px;margin-top:14px;display:none;font-weight:700;}
+.demo-divider{display:flex;align-items:center;gap:10px;margin:18px 0 14px;color:var(--gray-sub);font-size:11.5px;}
+.demo-divider::before,.demo-divider::after{content:'';flex:1;height:1px;background:var(--gray-line);}
+#demoBtn{width:100%;padding:12px;font-size:13px;font-weight:700;background:var(--white);color:var(--accent);border:1px solid var(--accent);}
+#demoBtn:hover{background:var(--accent-tint);}
 
-/* ---------- Top bar ---------- */
-.topbar{
-  position:sticky;top:0;z-index:20;
-  background:var(--canvas);
-  border-bottom:1px solid var(--hairline);
-  padding:var(--sp-md) var(--sp-lg);
-  display:flex;align-items:center;justify-content:space-between;gap:var(--sp-md);
-  flex-wrap:wrap;
-}
-.topbar-left{display:flex;align-items:baseline;gap:var(--sp-md);flex-wrap:wrap;}
-.brand{
-  font-size:20px;font-weight:600;line-height:1.4;letter-spacing:-0.125px;
-  color:var(--ink);
-}
-.brand b{color:var(--primary);}
-.week-nav{display:flex;align-items:center;gap:var(--sp-xs);}
-.week-label{
-  font-size:15px;font-weight:400;color:var(--ink-muted);
-  min-width:190px;text-align:center;
-}
-.icon-btn{
-  width:28px;height:28px;border-radius:var(--r-full);
-  border:1px solid var(--hairline);background:var(--surface);
-  color:var(--ink-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-size:14px;line-height:1;
-}
-.icon-btn:hover{background:var(--canvas-soft);color:var(--ink);}
-.topbar-right{display:flex;gap:var(--sp-sm);align-items:center;}
+/* ===================== 앱 레이아웃 ===================== */
+#appScreen{display:none; height:100vh; overflow:hidden; flex-direction:column;}
+.utility-bar{background:var(--ink); color:#fff; font-size:11px; padding:6px 32px; display:flex; justify-content:space-between; letter-spacing:.03em; flex-shrink:0;}
 
-.btn{
-  font-size:16px;font-weight:500;line-height:1.5;letter-spacing:0;
-  border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
-  transition:transform .08s ease,background .12s ease;
-}
-.btn:active{transform:scale(0.96);}
-.btn-primary{
-  background:var(--primary);color:var(--on-primary);
-  border-radius:var(--r-full);padding:10px 22px;
-}
-.btn-primary:hover{background:var(--primary-active);}
-.btn-secondary{
-  background:var(--surface);color:var(--ink);
-  border-radius:var(--r-full);padding:10px 22px;
-  box-shadow:var(--shadow-1);
-}
-.btn-utility{
-  background:var(--surface);color:var(--ink);
-  border-radius:var(--r-md);padding:4px 14px;
-  border:1px solid var(--hairline);font-size:15px;
-}
-.btn-utility:hover{background:var(--canvas-soft);}
-.btn-ghost{
-  background:transparent;color:var(--primary);
-  padding:4px 6px;font-size:14px;font-weight:600;border-radius:var(--r-sm);
-}
-.btn-ghost:hover{background:rgba(0,117,222,0.08);}
+/* 상단 네비게이션 (좌-메뉴 / 중앙-로고 / 우-유저, 라인은 하단 1개만) */
+.topnav{background:var(--white); border-bottom:1px solid var(--ink); padding:0 32px; flex-shrink:0;}
+.topnav-inner{display:flex; align-items:center; justify-content:space-between; height:64px;}
+.topnav-menu{display:flex; gap:26px; flex:1; align-items:center;}
+.nav-link{font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--gray-sub); cursor:pointer; padding:8px 0; border-bottom:2px solid transparent; white-space:nowrap;}
+.nav-link:hover{color:var(--ink);}
+.nav-link.active{color:var(--accent); border-bottom-color:var(--accent);}
+.topnav-brand{flex:1; text-align:center; display:flex; flex-direction:column; align-items:center; line-height:1.15; cursor:pointer;}
+.topnav-brand .brand-en{font-size:19px; font-weight:800; letter-spacing:.03em; color:var(--ink);}
+.topnav-brand .brand-kr{font-size:10px; color:var(--gray-sub); letter-spacing:.02em; margin-top:1px;}
+.topnav-user{flex:1; display:flex; justify-content:flex-end; align-items:center; gap:14px; font-size:12px; color:var(--gray-sub);}
+.topnav-user button{color:var(--accent); background:none; font-weight:800; font-size:12px;}
 
-/* ---------- Banner ---------- */
-.banner{
-  margin:var(--sp-lg) var(--sp-lg) 0;
-  background:#eaf3fd;
-  border:1px solid #d3e7fb;
-  border-radius:var(--r-lg);
-  padding:var(--sp-sm) var(--sp-md);
-  display:flex;align-items:flex-start;gap:var(--sp-sm);
-  font-size:15px;line-height:1.33;color:var(--secondary);
-}
-.banner .dot{
-  flex:0 0 auto;width:20px;height:20px;border-radius:var(--r-full);
-  background:var(--primary);color:#fff;font-size:12px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;margin-top:1px;
-}
+.page-area{flex:1; overflow-y:auto; background:var(--gray-light);}
+.page-inner{max-width:1180px; margin:0 auto; padding:32px 32px 64px;}
+.page{display:none;}
+.page.active{display:block;}
+.page-header{display:flex; align-items:baseline; gap:12px; margin-bottom:20px; flex-wrap:wrap;}
+.page-header h2{font-size:20px; font-weight:800;}
+.page-header-sub{font-size:12px; color:var(--gray-sub);}
 
-/* ---------- Layout ---------- */
-.layout{
-  display:grid;grid-template-columns:1fr 340px;gap:var(--sp-lg);
-  padding:var(--sp-lg);align-items:start;
-}
-.main-col{display:flex;flex-direction:column;gap:var(--sp-xxl);}
-.side-col{display:flex;flex-direction:column;gap:var(--sp-lg);position:sticky;top:88px;}
+.btn{padding:8px 15px; font-size:12.5px; font-weight:700; background:var(--white); color:var(--gray-text); border:1px solid var(--gray-line);}
+.btn:hover{border-color:var(--ink); color:var(--ink);}
+.btn-primary{background:var(--accent); color:#fff; border-color:var(--accent);}
+.btn-primary:hover{background:var(--accent-dark); border-color:var(--accent-dark); color:#fff;}
+.badge{font-size:11px; font-weight:800; letter-spacing:.02em;}
+.badge-draft{color:var(--gray-sub);}
+.badge-submitted{color:#1e7e34;}
+.badge-locked{color:var(--accent);}
 
-.section-head{margin-bottom:var(--sp-md);}
-.eyebrow{
-  font-size:12px;font-weight:600;line-height:1.33;letter-spacing:0.125px;
-  color:var(--primary);text-transform:uppercase;margin:0 0 4px;
-}
-.section-title{
-  font-size:26px;font-weight:700;line-height:1.23;letter-spacing:-0.625px;margin:0;
-  color:var(--ink);
-}
-.section-sub{
-  font-size:15px;color:var(--ink-muted);margin:6px 0 0;
-}
+.panel{background:var(--white); border:1px solid var(--gray-line); padding:20px; margin-bottom:18px;}
+.panel-title{font-size:13px; font-weight:800; margin:0 0 14px; display:flex; align-items:center; justify-content:space-between; text-transform:uppercase; letter-spacing:.03em;}
 
-/* ---------- Card grid ---------- */
-.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-md);}
-.card{
-  background:var(--surface);
-  border:1px solid var(--hairline);
-  border-radius:var(--r-lg);
-  padding:var(--sp-lg);
-}
-.card-title{
-  font-size:20px;font-weight:600;line-height:1.4;letter-spacing:-0.125px;
-  margin:0 0 var(--sp-sm);color:var(--ink);
-}
+/* ===================== 홈 히어로 (에디토리얼 그리드 - 큰 워드마크 + 얇은 세로선) ===================== */
+.hero{position:relative; display:flex; align-items:stretch; gap:0; margin-bottom:22px; background:var(--white); border:1px solid var(--gray-line);}
+.hero-left{flex:0 0 auto; padding:44px 40px; border-right:1px solid var(--gray-line);}
+.hero-eyebrow{font-size:11px; font-weight:800; letter-spacing:.14em; color:var(--accent); margin-bottom:14px;}
+.hero-title{font-size:36px; font-weight:800; line-height:1.15; margin-bottom:12px;}
+.hero-title span{color:var(--accent);}
+.hero-sub{font-size:13.5px; color:var(--gray-sub); margin-bottom:24px; max-width:340px;}
+.hero-actions{display:flex; gap:10px;}
+.hero-mark{flex:1; display:flex; align-items:center; justify-content:center; font-size:150px; font-weight:800;
+  color:var(--accent-tint); line-height:1; user-select:none; overflow:hidden;}
+.home-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:18px;}
+@media (max-width:800px){.home-grid{grid-template-columns:1fr;} .hero{flex-direction:column;} .hero-left{border-right:none; border-bottom:1px solid var(--gray-line);} .hero-mark{font-size:90px; padding:20px;}}
 
-/* ---------- Editable list ---------- */
-.item-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
-.item-row{display:flex;align-items:flex-start;gap:8px;}
-.item-num{
-  flex:0 0 auto;color:var(--ink-faint);font-size:15px;line-height:1.6;
-  min-width:16px;
-}
-.item-row input[type="text"]{
-  flex:1 1 auto;
-  border:none;border-bottom:1px solid transparent;
-  background:transparent;font-family:inherit;
-  font-size:15px;line-height:1.5;color:var(--ink);
-  padding:4px 2px;border-radius:var(--r-xs);
-}
-.item-row input[type="text"]::placeholder{color:var(--ink-faint);}
-.item-row input[type="text"]:hover{background:var(--canvas-soft);}
-.item-row input[type="text"]:focus{
-  outline:none;background:var(--canvas-soft);
-  box-shadow:0 0 0 2px rgba(0,117,222,0.15);
-}
-.item-remove{
-  flex:0 0 auto;width:20px;height:20px;border:none;background:transparent;
-  color:var(--ink-faint);cursor:pointer;border-radius:var(--r-sm);
-  opacity:0;transition:opacity .1s;font-size:14px;line-height:1;
-}
-.item-row:hover .item-remove{opacity:1;}
-.item-remove:hover{background:#fdeaea;color:#c22;}
-.add-item{
-  margin-top:8px;background:none;border:none;color:var(--primary);
-  font-size:14px;font-weight:600;cursor:pointer;padding:4px 2px;
-  border-radius:var(--r-sm);
-}
-.add-item:hover{background:rgba(0,117,222,0.08);}
+/* ===================== 캘린더 (밝은 톤 + 요일/공휴일 컬러) ===================== */
+.fc{--fc-border-color:var(--gray-line); --fc-today-bg-color:transparent;}
+.fc .fc-toolbar-title{font-size:15px; font-weight:800; color:var(--ink);}
+.fc .fc-button{background:var(--white) !important; border:1px solid var(--gray-line) !important; color:var(--gray-text) !important; box-shadow:none !important; font-weight:700; font-size:12px; border-radius:0 !important;}
+.fc .fc-button:hover{border-color:var(--accent) !important; color:var(--accent) !important;}
+.fc .fc-button-active{background:var(--accent) !important; border-color:var(--accent) !important; color:#fff !important;}
+.fc .fc-daygrid-day-number{color:var(--gray-sub); font-size:12px;}
+.fc-event{border:none !important; font-size:11.5px; padding:1px 4px; border-radius:0 !important;}
+.fc-day-today{background:var(--today) !important; box-shadow:inset 0 0 0 1px var(--today-border);}
+.fc-day-sun .fc-daygrid-day-number, .fc-col-header-cell.fc-day-sun .fc-col-header-cell-cushion{color:var(--sun) !important; font-weight:800;}
+.fc-day-sat .fc-daygrid-day-number, .fc-col-header-cell.fc-day-sat .fc-col-header-cell-cushion{color:var(--sat) !important; font-weight:800;}
+.fc-day-kr-holiday .fc-daygrid-day-number{color:var(--sun) !important; font-weight:800;}
+.calendar-legend{display:flex; gap:18px; margin-top:12px; font-size:11.5px; color:var(--gray-sub); flex-wrap:wrap;}
+.legend-dot{display:inline-block; width:9px; height:9px; margin-right:5px; vertical-align:-1px;}
+/* 이벤트칩: 배경을 채우지 않고 왼쪽 바 + 텍스트 컬러만 사용 (컬러 최소화) */
+.fc-daygrid-event{background:var(--white) !important; border-left:3px solid var(--tag-color, #888) !important; color:var(--gray-text) !important; padding-left:4px !important;}
+.fc-daygrid-event .fc-event-title{color:var(--gray-text) !important;}
 
-/* ---------- Lab sections ---------- */
-.lab-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--surface);color:var(--primary);
-  font-size:12px;font-weight:600;letter-spacing:0.125px;
-  border-radius:var(--r-full);padding:4px 10px;border:1px solid var(--hairline);
-  margin-bottom:6px;
-}
-.lab-badge .swatch{width:8px;height:8px;border-radius:var(--r-full);}
-.lab-toggle{
-  display:flex;align-items:center;justify-content:space-between;
-  cursor:pointer;user-select:none;
-}
-.lab-toggle .chev{
-  color:var(--ink-muted);font-size:13px;transition:transform .15s;
-}
-.lab.collapsed .chev{transform:rotate(-90deg);}
-.lab.collapsed .team-grid{display:none;}
+/* ===================== D-Day 카드 (라인 없이 배경 대비 + 볼드 숫자) ===================== */
+.dday-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:1px; background:var(--gray-line);}
+.dday-card{background:var(--white); padding:16px;}
+.dday-badge{display:block; font-size:22px; font-weight:800; letter-spacing:-.02em; margin-bottom:6px;}
+.dday-title-input{font-size:13.5px; font-weight:700; border:none; background:transparent; width:100%; padding:2px 0; margin-bottom:8px; color:var(--gray-text);}
+.dday-title-input:focus{outline:none; border-bottom:1px solid var(--accent);}
+.dday-title-static{font-size:13.5px; font-weight:700; margin-bottom:8px; display:block;}
+.dday-meta{font-size:11px; color:var(--gray-sub); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;}
+.dday-team-tag{color:var(--gray-text); font-weight:800; letter-spacing:.01em;}
+.dday-tag-label{font-weight:800;}
 
-.team-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--sp-md);margin-top:var(--sp-md);}
-.team-card{
-  background:var(--surface);border:1px solid var(--hairline);
-  border-radius:var(--r-lg);padding:var(--sp-lg);
-}
-.team-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-md);gap:var(--sp-sm);flex-wrap:wrap;}
-.team-name{
-  font-size:22px;font-weight:700;line-height:1.27;letter-spacing:-0.25px;color:var(--ink);
-}
-.pm-field{display:flex;align-items:center;gap:6px;}
-.pm-field label{font-size:14px;color:var(--ink-muted);}
-.pm-field input{
-  width:110px;border:1px solid #dddddd;border-radius:var(--r-xs);
-  padding:6px 8px;font-family:inherit;font-size:15px;color:var(--ink);
-}
-.pm-field input:focus{outline:none;box-shadow:0 0 0 2px rgba(0,117,222,0.15);border-color:var(--primary);}
-.subsection{margin-top:var(--sp-md);}
-.subsection-label{
-  display:inline-block;font-size:12px;font-weight:600;letter-spacing:0.125px;
-  color:var(--ink-secondary);background:var(--canvas-soft);
-  border-radius:var(--r-full);padding:3px 10px;margin-bottom:8px;
-}
-.subsection-label.research{color:#005bab;background:#eaf3fd;}
-.subsection-label.business{color:var(--accent-orange-deep);background:#fbe9dd;}
+/* ===================== 회의자료 작성 (2뎁스) ===================== */
+.team-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:1px; background:var(--gray-line);}
+.team-card{background:#fff; padding:20px; cursor:pointer; transition:background .12s;}
+.team-card:hover{background:var(--accent-tint);}
+.team-card .lab-tag{font-size:10px; color:var(--gray-sub); text-transform:uppercase; letter-spacing:.05em; font-weight:700;}
+.team-card .team-name{font-size:16px; font-weight:800; margin:8px 0 12px;}
 
-/* ---------- Sidebar cards ---------- */
-.side-card{
-  background:var(--surface);border:1px solid var(--hairline);
-  border-radius:var(--r-lg);padding:var(--sp-md);box-shadow:var(--shadow-1);
-}
-.side-card h4{
-  font-size:16px;font-weight:600;margin:0 0 var(--sp-sm);color:var(--ink);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.cal-nav{display:flex;align-items:center;gap:6px;}
-.cal-month-label{font-size:13px;color:var(--ink-muted);min-width:70px;text-align:center;}
+/* 에디터 */
+#editorWrap{background:var(--white); border:1px solid var(--gray-line); overflow:hidden;}
+#editor{min-height:320px; font-size:14px;}
+.ql-toolbar.ql-snow{border:none; border-bottom:1px solid var(--gray-line); background:var(--gray-light);}
+.ql-container.ql-snow{border:none;}
 
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center;}
-.cal-dow{font-size:11px;color:var(--ink-faint);padding:2px 0;font-weight:600;}
-.cal-day{
-  position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
-  font-size:12px;color:var(--ink-secondary);border-radius:var(--r-sm);cursor:pointer;
-}
-.cal-day.pad{visibility:hidden;cursor:default;}
-.cal-day:hover{background:var(--canvas-soft);}
-.cal-day.today{background:var(--primary);color:#fff;font-weight:700;}
-.cal-day .mark{
-  position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
-  width:4px;height:4px;border-radius:var(--r-full);background:var(--accent-teal);
-}
-.cal-day.weekly .mark{background:var(--primary);}
-.cal-day.holiday{color:var(--accent-pink);}
-.cal-day.holiday .mark{background:var(--accent-pink);}
-.cal-day.today .mark{background:#fff;}
+/* Presentation Mode */
+#presentationScreen{display:none; position:fixed; inset:0; background:#fff; z-index:999; overflow-y:auto; padding:48px 60px;}
+#presentationScreen .p-section{margin-bottom:36px; page-break-inside:avoid;}
+#presentationScreen .p-team-block{margin-bottom:32px; page-break-inside:avoid;}
+#presentationScreen .p-team-title{font-size:20px; font-weight:800; color:var(--accent); border-bottom:2px solid var(--ink); padding-bottom:8px; margin-bottom:12px;}
+#presentationScreen .p-content{font-size:16px; line-height:1.7;}
+#presentationScreen .p-section-title{font-size:12px; font-weight:800; margin-bottom:12px; color:var(--gray-sub); text-transform:uppercase; letter-spacing:.08em;}
+.p-event-row{display:flex; justify-content:space-between; font-size:13px; padding:8px 0; border-bottom:1px solid var(--gray-line);}
+#exitPresentation{position:fixed; top:20px; right:24px; z-index:1000;}
 
-.cal-legend{display:flex;gap:var(--sp-sm);margin-top:var(--sp-sm);font-size:11px;color:var(--ink-muted);flex-wrap:wrap;}
-.cal-legend span{display:inline-flex;align-items:center;gap:4px;}
-.cal-legend .sw{width:6px;height:6px;border-radius:var(--r-full);display:inline-block;}
+/* 모달 공통 */
+.modal-overlay{display:none; position:fixed; inset:0; background:rgba(17,17,19,.5); z-index:998; align-items:center; justify-content:center;}
+.modal-card{background:var(--white); width:380px; max-height:70vh; overflow:hidden; border:1px solid var(--ink); display:flex; flex-direction:column;}
+.modal-header{padding:16px 18px; border-bottom:1px solid var(--gray-line); font-size:14px; font-weight:800; display:flex; justify-content:space-between; align-items:center;}
+#archiveList{padding:0; overflow-y:auto;}
+.archive-row{display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid var(--gray-line);}
+.archive-week{font-size:13px; font-weight:800;}
+.archive-status{font-size:11px; color:var(--gray-sub); margin-top:2px;}
 
-.event-note{
-  margin-top:var(--sp-sm);
-  font-size:13px;color:var(--ink-secondary);
-  background:var(--canvas-soft);border-radius:var(--r-md);
-  padding:8px 10px;
-}
-.event-note input{
-  width:100%;border:none;background:transparent;font-family:inherit;font-size:13px;color:var(--ink-secondary);
-}
-.event-note input:focus{outline:none;}
-.event-note .cal-day-label{font-weight:600;color:var(--ink);margin-bottom:2px;display:block;font-size:12px;}
+/* 관리자 배너 / 코멘트 / 자동저장 표시 */
+.admin-banner{background:var(--accent-tint); border-left:3px solid var(--accent); padding:10px 14px; font-size:12.5px; font-weight:700; color:var(--accent-dark); margin-bottom:14px; display:none;}
+.comment-banner{background:var(--gray-light); border-left:3px solid var(--ink); padding:10px 14px; font-size:12.5px; margin-bottom:14px; display:none;}
+.comment-banner b{font-weight:800;}
+.autosave-indicator{font-size:11px; color:var(--gray-sub); margin-left:8px;}
 
-.annual-month{margin-bottom:var(--sp-sm);}
-.annual-month-title{
-  font-size:13px;font-weight:700;color:var(--ink);margin:0 0 4px;
-}
-.annual-item{display:flex;align-items:flex-start;gap:6px;margin-bottom:2px;}
-.annual-item .bar{width:3px;flex:0 0 auto;align-self:stretch;border-radius:2px;background:var(--accent-sky);margin-top:2px;}
-.annual-item input{
-  flex:1 1 auto;border:none;background:transparent;font-family:inherit;
-  font-size:13px;color:var(--ink-secondary);padding:2px;border-radius:var(--r-xs);
-}
-.annual-item input:hover{background:var(--canvas-soft);}
-.annual-item input:focus{outline:none;background:var(--canvas-soft);}
-.annual-item .item-remove{width:16px;height:16px;font-size:11px;}
-.add-annual{
-  font-size:12px;color:var(--primary);background:none;border:none;cursor:pointer;font-weight:600;padding:2px;
-}
+/* 내 작성 히스토리 미니 타임라인 */
+.mini-history{display:flex; gap:6px; margin:14px 0 4px;}
+.mini-history .dot{width:10px; height:10px; flex-shrink:0;}
+.mini-history .dot.done{background:var(--accent);}
+.mini-history .dot.empty{background:var(--gray-line);}
+.mini-history-label{font-size:10.5px; color:var(--gray-sub); margin-top:4px;}
 
-/* ---------- Footer ---------- */
-.site-footer{
-  background:var(--canvas-soft);color:var(--ink-secondary);
-  font-size:14px;line-height:1.43;padding:var(--sp-xxl) var(--sp-lg);
-  margin-top:var(--sp-lg);border-top:1px solid var(--hairline);
-  display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-sm);
-}
-.site-footer .muted{color:var(--ink-faint);}
+/* 제출률 대시보드 */
+.rate-bar-wrap{display:flex; align-items:baseline; gap:14px; margin-bottom:6px;}
+.rate-number{font-size:30px; font-weight:800;}
+.rate-bar{flex:1; height:6px; background:var(--gray-line); position:relative;}
+.rate-bar-fill{position:absolute; left:0; top:0; bottom:0; background:var(--accent);}
 
-/* ---------- Toast ---------- */
-.toast{
-  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);
-  background:var(--ink);color:#fff;padding:12px 20px;border-radius:var(--r-full);
-  font-size:14px;box-shadow:var(--shadow-2);opacity:0;pointer-events:none;
-  transition:opacity .2s,transform .2s;z-index:50;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+/* 활동 로그 */
+.log-row{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--gray-line); font-size:12px;}
+.log-row:last-child{border-bottom:none;}
+.log-meta{color:var(--gray-sub);}
 
-/* ---------- Responsive ---------- */
-@media (max-width:960px){
-  .layout{grid-template-columns:1fr;}
-  .side-col{position:static;}
-  .card-grid{grid-template-columns:repeat(2,1fr);}
-  .team-grid{grid-template-columns:1fr;}
-}
-@media (max-width:600px){
-  .card-grid{grid-template-columns:1fr;}
-  .topbar{flex-direction:column;align-items:stretch;}
-  .topbar-right{justify-content:flex-end;}
-  .week-label{min-width:0;}
-}
+/* 관리자 팀 현황 행 (코멘트/마감연장 버튼 포함) */
+.admin-team-row{display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:var(--gray-light); font-size:12.5px; gap:8px;}
+.admin-team-row .row-actions{display:flex; gap:6px;}
+.admin-team-row .row-actions button{font-size:10.5px; padding:4px 8px;}
+
+/* 다른 팀 미리보기 모달 */
+.other-team-preview{padding:14px 18px; font-size:13px; line-height:1.6; max-height:280px; overflow-y:auto; border-top:1px solid var(--gray-line);}
+
 
 @media print{
-  .topbar,.banner,.side-col,.add-item,.add-annual,.item-remove{display:none !important;}
-  .layout{grid-template-columns:1fr;}
-  body{background:#fff;}
-  .card,.team-card{break-inside:avoid;}
+  body *{visibility:hidden;}
+  #printArea, #printArea *{visibility:visible;}
+  #printArea{position:absolute; left:0; top:0; width:100%; padding:0;}
+  .p-team-block,.p-section{page-break-inside:avoid; margin-bottom:24px;}
+  .topnav, .utility-bar, #exitPresentation, #printBtn{display:none !important;}
 }
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
 </style>
 </head>
 <body>
-<div class="page">
 
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="brand">Weekly <b>회의 자료</b></div>
-      <div class="week-nav">
-        <button class="icon-btn" id="prevWeek" title="이전 주">‹</button>
-        <div class="week-label" id="weekLabel"></div>
-        <button class="icon-btn" id="nextWeek" title="다음 주">›</button>
+<!-- ===================== 로그인 화면 ===================== -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="brand-logo">CSES</div>
+    <div class="brand-kr-sub">사회적가치연구원</div>
+    <h1>Weekly 회의자료 취합 시스템</h1>
+    <p>사내 Google 계정(@cses.re.kr)으로 로그인하세요</p>
+    <div id="googleSignInBtn"></div>
+    <div class="login-error" id="loginError"></div>
+    <div class="demo-divider">또는</div>
+    <button id="demoBtn">🔓 구글 로그인 없이 화면 테스트하기</button>
+  </div>
+</div>
+
+<!-- ===================== 메인 앱 ===================== -->
+<div id="appScreen">
+  <div class="utility-bar">
+    <span>CSES · Center for Social Value Enhancement Studies</span>
+    <span id="utilityDeadline">이번 주 마감 · 매주 목요일 16:00</span>
+  </div>
+
+  <header class="topnav">
+    <div class="topnav-inner">
+      <nav class="topnav-menu">
+        <a class="nav-link" data-page="home">홈</a>
+        <a class="nav-link" data-page="calendar">캘린더 &amp; 일정</a>
+        <a class="nav-link" data-page="write">회의자료 작성</a>
+        <a class="nav-link" id="navPresentation">회의용 화면</a>
+        <a class="nav-link" id="navArchive">지난 자료</a>
+        <a class="nav-link" data-page="admin" id="navAdmin" style="display:none;">관리자</a>
+      </nav>
+      <div class="topnav-brand" data-page="home">
+        <span class="brand-en">CSES</span>
+        <span class="brand-kr">사회적가치연구원</span>
       </div>
-    </div>
-    <div class="topbar-right">
-      <button class="btn btn-utility" id="printBtn">인쇄 / 내보내기</button>
-      <button class="btn btn-primary" id="submitBtn">제출 완료</button>
+      <div class="topnav-user">
+        <span id="userNameLabel">-</span>
+        <button id="logoutBtn">로그아웃</button>
+      </div>
     </div>
   </header>
 
-  <div class="banner">
-    <div class="dot">!</div>
-    <div>각 팀에서는 공유가 필요한 <b>주요 일정</b>을 우측 캘린더에 기입을 부탁드립니다.</div>
-  </div>
+  <main class="page-area">
+    <div class="page-inner">
 
-  <div class="layout">
-    <main class="main-col">
-
-      <section class="section" id="orgSection">
-        <div class="section-head">
-          <p class="eyebrow">주요 일정</p>
-          <h2 class="section-title">조직 공통</h2>
-          <p class="section-sub">통합사무국 · 홍보 · 연구기획팀</p>
-        </div>
-        <div class="card-grid" id="orgGrid"></div>
-      </section>
-
-      <section class="lab" data-lab="S-Lab" id="labSPC">
-        <div class="section-head lab-toggle">
-          <div>
-            <span class="lab-badge"><span class="swatch" style="background:var(--accent-sky)"></span>LAB</span>
-            <h2 class="section-title">S-Lab</h2>
+      <!-- ---------- 홈 ---------- -->
+      <section id="page-home" class="page">
+        <div class="hero">
+          <div class="hero-left">
+            <div class="hero-eyebrow">WEEKLY REPORT SYSTEM</div>
+            <h1 class="hero-title">CSES<br><span>Weekly</span></h1>
+            <p class="hero-sub">사회적가치연구원 실·팀장 주간 회의자료를 한곳에서 작성하고, 캘린더와 주요 일정을 함께 관리하세요.</p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" data-goto="write">회의자료 작성하러 가기</button>
+              <button class="btn" data-goto="calendar">캘린더 &amp; 일정 보기</button>
+            </div>
           </div>
-          <span class="chev">▾</span>
+          <div class="hero-mark">CSES</div>
         </div>
-        <div class="team-grid" id="labGrid-S-Lab"></div>
-      </section>
-
-      <section class="lab" data-lab="V-Lab" id="labVLab">
-        <div class="section-head lab-toggle">
+        <div class="home-grid">
           <div>
-            <span class="lab-badge"><span class="swatch" style="background:var(--accent-teal)"></span>LAB</span>
-            <h2 class="section-title">V-Lab</h2>
+            <div class="panel" id="myTeamPanel">
+              <div class="panel-title">내 팀 작성 현황</div>
+              <div id="myTeamStatus"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">이번 주 마감</div>
+              <div id="homeDeadline" style="font-size:28px; font-weight:800;"></div>
+              <div style="font-size:12px; color:var(--gray-sub); margin-top:4px;">매주 목요일 16:00 자동 마감</div>
+            </div>
           </div>
-          <span class="chev">▾</span>
+          <div class="panel">
+            <div class="panel-title">다가오는 주요 일정</div>
+            <div id="homeDdayList" class="dday-grid" style="grid-template-columns:1fr;"></div>
+          </div>
         </div>
-        <div class="team-grid" id="labGrid-V-Lab"></div>
       </section>
 
-      <section class="lab" data-lab="D-Lab" id="labDLab">
-        <div class="section-head lab-toggle">
-          <div>
-            <span class="lab-badge"><span class="swatch" style="background:var(--accent-purple)"></span>LAB</span>
-            <h2 class="section-title">D-Lab</h2>
+      <!-- ---------- 캘린더 & 일정 (조회 전용) ---------- -->
+      <section id="page-calendar" class="page">
+        <div class="page-header"><h2>캘린더 &amp; 일정</h2><span class="page-header-sub">조회 전용 · 전주 확정본</span></div>
+        <div class="panel">
+          <div class="panel-title">5주 캘린더</div>
+          <div id="roCalendarEl"></div>
+          <div class="calendar-legend">
+            <span><i class="legend-dot" style="background:var(--today);border:1px solid var(--today-border);"></i>오늘</span>
+            <span><i class="legend-dot" style="background:var(--sun);"></i>일요일 · 공휴일</span>
+            <span><i class="legend-dot" style="background:var(--sat);"></i>토요일</span>
           </div>
-          <span class="chev">▾</span>
         </div>
-        <div class="team-grid" id="labGrid-D-Lab"></div>
+        <div class="panel">
+          <div class="panel-title">중장기 주요 일정 (D-Day)</div>
+          <div id="roDdayEl" class="dday-grid"></div>
+        </div>
       </section>
 
-    </main>
-
-    <aside class="side-col">
-      <div class="side-card">
-        <h4>
-          캘린더
-          <span class="cal-nav">
-            <button class="icon-btn" id="prevMonth">‹</button>
-            <span class="cal-month-label" id="calMonthLabel"></span>
-            <button class="icon-btn" id="nextMonth">›</button>
-          </span>
-        </h4>
-        <div class="cal-grid" id="calGrid"></div>
-        <div class="cal-legend">
-          <span><span class="sw" style="background:var(--primary)"></span>Weekly 회의</span>
-          <span><span class="sw" style="background:var(--accent-pink)"></span>공휴일/휴무</span>
-          <span><span class="sw" style="background:var(--accent-teal)"></span>사내 일정</span>
+      <!-- ---------- 회의자료 작성 (1뎁스: 팀 목록) ---------- -->
+      <section id="page-write" class="page">
+        <div id="writeDepth1">
+          <div class="page-header"><h2>회의자료 작성</h2><span class="page-header-sub">작성할 팀을 선택하세요</span></div>
+          <div class="team-grid" id="writeTeamGrid"></div>
         </div>
-        <div id="calEventEditor"></div>
-      </div>
 
-      <div class="side-card">
-        <h4>연간 주요 행사</h4>
-        <div id="annualList"></div>
-      </div>
-    </aside>
-  </div>
+        <!-- ---------- 회의자료 작성 (2뎁스: 팀별 작성 화면) ---------- -->
+        <div id="writeDepth2" style="display:none;">
+          <div class="page-header">
+            <button class="btn" id="btnBackToTeams">← 팀 목록</button>
+            <h2 id="writeTeamTitle"></h2>
+            <span class="badge" id="writeStatusBadge"></span>
+          </div>
 
-  <footer class="site-footer">
-    <span>실팀장 Weekly 자료 · 사내 전용</span>
-    <span class="muted" id="savedAt">저장됨</span>
-  </footer>
+          <div class="admin-banner" id="adminBanner">🔓 관리자 권한으로 마감 후에도 수정 가능합니다.</div>
+          <div class="comment-banner" id="commentBanner"></div>
 
+          <div class="panel">
+            <div class="panel-title">
+              <span>이 팀 캘린더 &amp; 일정 <span style="color:var(--accent);font-weight:800;">(수정 가능)</span></span>
+              <button class="btn" id="btnAddEventTeam" style="font-size:11.5px;padding:5px 10px;">+ 일정 추가</button>
+            </div>
+            <div id="teamCalendarEl"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">중장기 주요 일정 (D-Day, 행사명 클릭해서 수정 가능)</div>
+            <div id="teamDdayEl" class="dday-grid"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">
+              <span>회의 안건 작성 <span class="autosave-indicator" id="autosaveIndicator"></span></span>
+              <span style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn" id="btnOtherTeams">다른 팀 최근 내용 보기</button>
+                <button class="btn" id="btnTemplate">기본 템플릿 불러오기</button>
+                <button class="btn" id="btnInsertTable">+ 표 삽입</button>
+                <button class="btn" id="btnLoadPrev">지난주 내용 불러오기</button>
+                <button class="btn btn-primary" id="btnSave">저장</button>
+              </span>
+            </div>
+            <div id="editorWrap"><div id="editor"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- 관리자 ---------- -->
+      <section id="page-admin" class="page">
+        <div class="page-header"><h2>관리자</h2><span class="page-header-sub">비서 · 연구기획팀 전용 · 마감과 무관하게 항상 전체 수정 가능</span></div>
+
+        <div class="panel">
+          <div class="panel-title">이번 주 제출률</div>
+          <div class="rate-bar-wrap">
+            <span class="rate-number" id="rateNumber">0%</span>
+            <div class="rate-bar"><div class="rate-bar-fill" id="rateBarFill" style="width:0%;"></div></div>
+          </div>
+          <div style="font-size:11.5px;color:var(--gray-sub);" id="rateSubLabel"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">마감 관리</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+            <button class="btn" id="btnResendReminder">독촉 메일 재발송</button>
+            <button class="btn" id="btnExtendDeadline">전체 마감 연장</button>
+            <button class="btn" id="btnExtendTeamDeadline">팀별 마감 연장</button>
+            <button class="btn btn-primary" id="btnApproveWeek">이번 주 최종 승인</button>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn" id="btnBulkExport">여러 주차 일괄 내보내기</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">팀별 제출 현황 (코멘트 · 마감 연장은 각 행에서)</div>
+          <div id="adminSummaryList"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">활동 로그</div>
+          <div id="activityLogList"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- ===================== 다른 팀 최근 내용 보기 모달 ===================== -->
+<div id="otherTeamsModal" class="modal-overlay">
+  <div class="modal-card" style="width:460px;">
+    <div class="modal-header"><span>다른 팀 최근 내용 (읽기 전용)</span><button class="btn" id="otherTeamsCloseBtn">닫기</button></div>
+    <div id="otherTeamsList" style="overflow-y:auto;"></div>
+    <div id="otherTeamPreview" class="other-team-preview" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ===================== 일괄 내보내기 모달 ===================== -->
+<div id="bulkExportModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><span>여러 주차 일괄 내보내기</span><button class="btn" id="bulkExportCloseBtn">닫기</button></div>
+    <div id="bulkExportList" style="padding:14px 18px;"></div>
+    <div style="padding:0 18px 18px;">
+      <button class="btn btn-primary" id="bulkExportConfirmBtn" style="width:100%;">선택한 주차 내보내기 (인쇄/PDF)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== Presentation / Print 화면 ===================== -->
+<div id="presentationScreen">
+  <button class="btn btn-primary" id="exitPresentation">닫기</button>
+  <button class="btn" id="printBtn" style="position:fixed; top:20px; right:120px; z-index:1000;">인쇄 / PDF</button>
+  <div style="font-size:12px; color:var(--gray-sub); margin-bottom:24px;">회의용 화면 · <b id="presentationWeekLabel"></b></div>
+  <div id="printArea"></div>
+</div>
+
+<!-- ===================== 지난 자료(Archive) 모달 ===================== -->
+<div id="archiveModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-header"><span>지난 자료</span><button class="btn" id="archiveCloseBtn">닫기</button></div>
+    <div id="archiveList"></div>
+  </div>
+</div>
 
 <script>
-(function(){
-  var STORAGE_KEY = 'weeklyReportState_v1';
+/* ============================================================
+ * 설정: 배포된 GAS 웹앱 URL / Google OAuth Client ID를 입력하세요.
+ * ============================================================ */
+const GAS_API_URL = 'https://script.google.com/macros/s/[YOUR_DEPLOYMENT_ID]/exec';
+const GOOGLE_CLIENT_ID = '633540743274-3irl57ce0ossakshumkj2limilqk6asj.apps.googleusercontent.com';
 
-  var DOW = ['일','월','화','수','목','금','토'];
+// 캘린더 태그 컬러: 채도를 낮춘 톤온톤 팔레트 (포인트 레드와 겹치지 않도록 레드 계열 제외)
+const TAG_COLORS = { '출장':'#b8734a', '포럼':'#6b7a99', '휴무일':'#9a9aa2', '공식회의':'#5c8a6e', '기타':'#a68b3f' };
 
-  var defaultState = {
-    org: {
-      '통합사무국': ['', '', ''],
-      '홍보': ['', '', ''],
-      '연구기획팀': ['', '', '']
-    },
-    labs: {
-      'S-Lab': [
-        { name: 'SPC팀', pm: '', research: ['', '', ''], business: ['', '', ''] },
-        { name: 'EPC팀', pm: '', research: ['', '', ''], business: ['', '', ''] }
-      ],
-      'V-Lab': [
-        { name: '측정센터', pm: '', research: ['', '', ''], business: ['', '', ''] },
-        { name: 'SV회계연구팀', pm: '', research: ['', '', ''], business: ['', '', ''] }
-      ],
-      'D-Lab': [
-        { name: '제도화팀', pm: '', research: ['', '', ''], business: ['', '', ''] },
-        { name: '거래화팀', pm: '', research: ['', '', ''], business: ['', '', ''] }
-      ]
-    },
-    calEvents: {},
-    annual: {
-      '4월': [''],
-      '5월': ['제주포럼', 'UNEP 환경의 날'],
-      '6월': ['전략회의'],
-      '7월': [''],
-      '8월': ['사회적 가치 페스타(KSVF)'],
-      '9월': [''],
-      '10월': ['Reuters Sustainability Awards', 'Social Enterprise World Forum(SEWF)'],
-      '11월': ['베이징포럼 / 동경포럼(미정)'],
-      '12월': ['']
-    },
-    lastSaved: null,
-    labCollapsed: {}
-  };
+// ※ 2026년 공휴일은 예시입니다(음력 기준 명절 포함). 매년 초 정확한 날짜로 업데이트해서 사용하세요.
+const KR_HOLIDAYS_2026 = [
+  '2026-01-01','2026-02-16','2026-02-17','2026-02-18','2026-03-01','2026-05-05',
+  '2026-05-24','2026-06-06','2026-08-15','2026-09-24','2026-09-25','2026-09-26',
+  '2026-10-03','2026-10-09','2026-12-25'
+];
+function dayCellClassNames(arg) {
+  const y = arg.date.getFullYear(), m = String(arg.date.getMonth()+1).padStart(2,'0'), d = String(arg.date.getDate()).padStart(2,'0');
+  return KR_HOLIDAYS_2026.includes(`${y}-${m}-${d}`) ? ['fc-day-kr-holiday'] : [];
+}
 
-  var state = load();
+let STATE = {
+  idToken:null, user:null, teams:[], currentWeekId:null, currentPage:'home',
+  writeTeamId:null, quill:null
+};
 
-  function load(){
-    try{
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return JSON.parse(JSON.stringify(defaultState));
-      var parsed = JSON.parse(raw);
-      return Object.assign(JSON.parse(JSON.stringify(defaultState)), parsed);
-    }catch(e){
-      return JSON.parse(JSON.stringify(defaultState));
-    }
-  }
+/* ---------------- API 헬퍼 ---------------- */
+const DEMO_MODE = GAS_API_URL.includes('[YOUR_DEPLOYMENT_ID]');
+async function api(action, payload = {}) {
+  if (DEMO_MODE) return mockApi(action, payload);
+  const res = await fetch(GAS_API_URL, { method:'POST', body: JSON.stringify({ action, idToken: STATE.idToken, ...payload }) });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || '요청 처리 중 오류가 발생했습니다.');
+  return json.data;
+}
 
-  function save(){
-    state.lastSaved = new Date().toISOString();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    var el = document.getElementById('savedAt');
-    if(el) el.textContent = '마지막 저장 · ' + new Date(state.lastSaved).toLocaleTimeString('ko-KR');
-  }
+/* ---------------- 테스트(더미데이터) 모드 ---------------- */
+const MOCK_DB = {
+  teams: [
+    { team_id:'HR', team_name:'HR팀', lab:'통합사무국' },
+    { team_id:'PR', team_name:'홍보팀', lab:'통합사무국' },
+    { team_id:'PLAN', team_name:'연구기획팀', lab:'연구기획실' },
+    { team_id:'SPC', team_name:'SPC팀', lab:'S-Lab' },
+    { team_id:'EPC', team_name:'EPC팀', lab:'S-Lab' },
+    { team_id:'MEASURE', team_name:'측정센터', lab:'V-Lab' },
+    { team_id:'SVACC', team_name:'SV회계연구팀', lab:'V-Lab' },
+    { team_id:'INST', team_name:'제도화팀', lab:'D-Lab' },
+    { team_id:'TRADE', team_name:'거래화팀', lab:'D-Lab' }
+  ],
+  weekly: {},
+  calendar: [
+    { event_id:'e1', title:'오사카 엑스포 출장', team_id:'ALL', tag:'출장', start_date:'2026-08-24', end_date:'2026-08-28', is_longterm:true, description:'오사카 엑스포 참가' },
+    { event_id:'e2', title:'제1회 SV포럼', team_id:'ALL', tag:'포럼', start_date:'2026-08-31', end_date:'2026-08-31', is_longterm:false, description:'전사 포럼' },
+    { event_id:'e3', title:'상하이 포럼 준비', team_id:'SPC', tag:'포럼', start_date:'2026-08-20', end_date:'2026-09-10', is_longterm:true, description:'상하이 포럼 사전 준비 기간' },
+    { event_id:'e4', title:'경영평가 보고서 제출', team_id:'PLAN', tag:'공식회의', start_date:'2026-09-05', end_date:'2026-09-05', is_longterm:true, description:'하반기 경영평가 보고서 제출 마감' }
+  ],
+  archive: [
+    { week_id:'2026-W30', all_submitted:true, approved_by:'demo@cses.re.kr' },
+    { week_id:'2026-W31', all_submitted:true, approved_by:'demo@cses.re.kr' },
+    { week_id:'2026-W32', all_submitted:false, approved_by:'' }
+  ],
+  activityLog: []
+};
 
-  function el(tag, cls, text){
-    var e = document.createElement(tag);
-    if(cls) e.className = cls;
-    if(text !== undefined) e.textContent = text;
-    return e;
-  }
+// 회의자료 작성 항목 템플릿 (상세형 5항목) - "+ 기본 템플릿 불러오기" 버튼에서 사용
+const AGENDA_TEMPLATE = `
+<p><strong>① 연구 추진현황</strong></p><p><br></p>
+<p><strong>② 사업 추진현황</strong></p><p><br></p>
+<p><strong>③ 행사·세미나·포럼</strong></p><p><br></p>
+<p><strong>④ 이사장 보고·의결 안건</strong></p><p><em style="color:#9a9aa2;">(해당 사항 있을 때만 작성)</em></p><p><br></p>
+<p><strong>⑤ 기타 특이사항</strong></p><p><br></p>
+`;
 
-  /* ---------------- Org cards ---------------- */
-  function renderOrg(){
-    var grid = document.getElementById('orgGrid');
-    grid.innerHTML = '';
-    Object.keys(state.org).forEach(function(teamName){
-      var card = el('div', 'card');
-      card.appendChild(el('div', 'card-title', teamName));
-      var list = buildEditableList(state.org[teamName], false, function(newArr){
-        state.org[teamName] = newArr; save();
-      });
-      card.appendChild(list.ul);
-      card.appendChild(list.addBtn);
-      grid.appendChild(card);
-    });
-  }
-
-  /* build an editable bullet/numbered list bound to an array */
-  function buildEditableList(arr, numbered, onChange){
-    var ul = el('ul', 'item-list');
-    function renderRows(){
-      ul.innerHTML = '';
-      arr.forEach(function(val, idx){
-        var li = el('li', 'item-row');
-        var marker = el('span', 'item-num', numbered ? (idx+1)+'.' : '·');
-        var input = document.createElement('input');
-        input.type = 'text';
-        input.value = val;
-        input.placeholder = '이번 주 업데이트를 입력하세요';
-        input.addEventListener('input', function(){
-          arr[idx] = input.value;
-          onChange(arr);
-        });
-        var rm = el('button', 'item-remove', '✕');
-        rm.type = 'button';
-        rm.addEventListener('click', function(){
-          arr.splice(idx, 1);
-          onChange(arr);
-          renderRows();
-        });
-        li.appendChild(marker);
-        li.appendChild(input);
-        li.appendChild(rm);
-        ul.appendChild(li);
-      });
-    }
-    renderRows();
-    var addBtn = el('button', 'add-item', '+ 항목 추가');
-    addBtn.type = 'button';
-    addBtn.addEventListener('click', function(){
-      arr.push('');
-      onChange(arr);
-      renderRows();
-      var last = ul.querySelector('.item-row:last-child input');
-      if(last) last.focus();
-    });
-    return { ul: ul, addBtn: addBtn, refresh: renderRows };
-  }
-
-  /* ---------------- Lab / team cards ---------------- */
-  function renderLabs(){
-    Object.keys(state.labs).forEach(function(labName){
-      var grid = document.getElementById('labGrid-' + labName);
-      grid.innerHTML = '';
-      state.labs[labName].forEach(function(team){
-        var card = el('div', 'team-card');
-
-        var head = el('div', 'team-head');
-        head.appendChild(el('div', 'team-name', team.name));
-        var pmField = el('div', 'pm-field');
-        pmField.appendChild(el('label', null, 'PM'));
-        var pmInput = document.createElement('input');
-        pmInput.type = 'text';
-        pmInput.placeholder = '이름';
-        pmInput.value = team.pm;
-        pmInput.addEventListener('input', function(){ team.pm = pmInput.value; save(); });
-        pmField.appendChild(pmInput);
-        head.appendChild(pmField);
-        card.appendChild(head);
-
-        var researchSub = el('div', 'subsection');
-        researchSub.appendChild(el('span', 'subsection-label research', '연구'));
-        var rList = buildEditableList(team.research, true, function(newArr){ team.research = newArr; save(); });
-        researchSub.appendChild(rList.ul);
-        researchSub.appendChild(rList.addBtn);
-        card.appendChild(researchSub);
-
-        var businessSub = el('div', 'subsection');
-        businessSub.appendChild(el('span', 'subsection-label business', '사업'));
-        var bList = buildEditableList(team.business, true, function(newArr){ team.business = newArr; save(); });
-        businessSub.appendChild(bList.ul);
-        businessSub.appendChild(bList.addBtn);
-        card.appendChild(businessSub);
-
-        grid.appendChild(card);
-      });
-    });
-
-    document.querySelectorAll('.lab-toggle').forEach(function(toggle){
-      toggle.addEventListener('click', function(){
-        var section = toggle.closest('.lab');
-        var lab = section.getAttribute('data-lab');
-        state.labCollapsed[lab] = !state.labCollapsed[lab];
-        section.classList.toggle('collapsed', !!state.labCollapsed[lab]);
-        save();
-      });
-    });
-    document.querySelectorAll('.lab').forEach(function(section){
-      var lab = section.getAttribute('data-lab');
-      section.classList.toggle('collapsed', !!state.labCollapsed[lab]);
-    });
-  }
-
-  /* ---------------- Week header nav ---------------- */
-  var today = new Date();
-  var weekStart = mondayOf(today);
-
-  function mondayOf(d){
-    var date = new Date(d);
-    var day = date.getDay(); // 0 Sun ... 6 Sat
-    var diff = (day === 0 ? -6 : 1 - day);
-    date.setDate(date.getDate() + diff);
-    date.setHours(0,0,0,0);
-    return date;
-  }
-
-  function fmtMD(d){ return (d.getMonth()+1) + '/' + d.getDate(); }
-
-  function weekOfMonth(d){
-    var first = new Date(d.getFullYear(), d.getMonth(), 1);
-    var firstMonday = mondayOf(first);
-    if(firstMonday.getMonth() !== d.getMonth() && firstMonday > first){
-      firstMonday.setDate(firstMonday.getDate() - 7);
-    }
-    var diffDays = Math.round((d - new Date(d.getFullYear(), d.getMonth(), 1)) / 86400000);
-    return Math.floor((diffDays + new Date(d.getFullYear(), d.getMonth(), 1).getDay() + 6) / 7) + 1;
-  }
-
-  function renderWeekLabel(){
-    var end = new Date(weekStart);
-    end.setDate(end.getDate() + 6);
-    var wk = Math.ceil((weekStart.getDate()) / 7);
-    document.getElementById('weekLabel').textContent =
-      weekStart.getFullYear() + '년 ' + (weekStart.getMonth()+1) + '월 ' + wk + '주차 (' + fmtMD(weekStart) + '~' + fmtMD(end) + ')';
-  }
-
-  document.getElementById('prevWeek').addEventListener('click', function(){
-    weekStart.setDate(weekStart.getDate() - 7); renderWeekLabel();
+function seedMockWeeklyContent() {
+  const sample = (team, week) => ({
+    record_id:`${week}_${team.team_id}`, week_id:week, team_id:team.team_id,
+    content_html:`<p><strong>① 연구 추진현황</strong></p><p>${team.team_name} 관련 연구과제 정상 진행 중</p>
+      <p><strong>② 사업 추진현황</strong></p><p>이번 주 특이사항 없음</p>
+      <p><strong>③ 행사·세미나·포럼</strong></p><p>다음 주 예정된 행사 준비 중</p>
+      <p><strong>④ 이사장 보고·의결 안건</strong></p><p><em style="color:#9a9aa2;">해당 없음</em></p>
+      <p><strong>⑤ 기타 특이사항</strong></p><p>없음</p>`,
+    status:'submitted', updated_by:'demo@cses.re.kr', updated_at:new Date().toISOString(),
+    admin_comment:'', deadline_override:''
   });
-  document.getElementById('nextWeek').addEventListener('click', function(){
-    weekStart.setDate(weekStart.getDate() + 7); renderWeekLabel();
+  // 지난 2주(2026-W30, W31)는 전 팀 제출 완료된 상태로 시드
+  ['2026-W30','2026-W31'].forEach(week => {
+    MOCK_DB.teams.forEach(team => { MOCK_DB.weekly[`${week}_${team.team_id}`] = sample(team, week); });
   });
+  // 2026-W32는 절반만 제출 (마감 놓친 사례 시연)
+  MOCK_DB.teams.forEach((team, idx) => {
+    if (idx % 2 === 1) return;
+    MOCK_DB.weekly[`2026-W32_${team.team_id}`] = sample(team, '2026-W32');
+  });
+  // 이번 주(demo-week)는 일부 팀만 제출 - "작성한 팀만 자료에 반영"을 시연하기 위해 2개 팀은 비워둠
+  MOCK_DB.teams.forEach(team => {
+    if (team.team_id === 'INST' || team.team_id === 'TRADE') return; // 미제출 상태로 남김
+    const rec = sample(team, 'demo-week');
+    if (team.team_id === 'PLAN') rec.admin_comment = '이사장 보고 안건 항목을 조금 더 구체적으로 보완해주세요.';
+    MOCK_DB.weekly[`demo-week_${team.team_id}`] = rec;
+  });
+}
+seedMockWeeklyContent();
 
-  /* ---------------- Mini calendar ---------------- */
-  var calDate = new Date(today.getFullYear(), today.getMonth(), 1);
-  var selectedDateKey = null;
+function mockWeekId(){ return 'demo-week'; }
+function logActivity(action, detail) {
+  MOCK_DB.activityLog.unshift({
+    log_id:'log'+Date.now()+Math.random().toString(36).slice(2,6),
+    action, detail, actor: STATE.user ? STATE.user.email : 'system',
+    actor_role: STATE.user ? STATE.user.role : '', timestamp:new Date().toISOString()
+  });
+  if (MOCK_DB.activityLog.length > 50) MOCK_DB.activityLog.length = 50;
+}
 
-  function dateKey(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
-
-  function renderCalendar(){
-    var grid = document.getElementById('calGrid');
-    grid.innerHTML = '';
-    DOW.forEach(function(d){ grid.appendChild(el('div','cal-dow', d)); });
-
-    var y = calDate.getFullYear(), m = calDate.getMonth();
-    document.getElementById('calMonthLabel').textContent = y + '.' + String(m+1).padStart(2,'0');
-
-    var firstDow = new Date(y, m, 1).getDay();
-    var daysInMonth = new Date(y, m+1, 0).getDate();
-
-    for(var i=0;i<firstDow;i++){ grid.appendChild(el('div','cal-day pad')); }
-
-    for(var day=1; day<=daysInMonth; day++){
-      var dow = new Date(y, m, day).getDay();
-      var key = dateKey(y,m,day);
-      var cell = el('div', 'cal-day');
-      cell.textContent = day;
-      if(dow === 1) cell.classList.add('weekly'); // Monday recurring meeting
-      if(dow === 0 || dow === 6) cell.classList.add('holiday-ish');
-      var isToday = (y===today.getFullYear() && m===today.getMonth() && day===today.getDate());
-      if(isToday) cell.classList.add('today');
-
-      var hasEvent = state.calEvents[key] && state.calEvents[key].trim();
-      if(hasEvent){
-        cell.classList.add('holiday');
-        cell.appendChild(el('span','mark'));
-      } else if(dow === 1){
-        cell.appendChild(el('span','mark'));
+async function mockApi(action, payload) {
+  await new Promise(r => setTimeout(r, 150));
+  switch (action) {
+    case 'login':
+      return { user:{ email:'demo@cses.re.kr', name:'테스트 사용자', team_id:'SPC', role:'admin' } };
+    case 'getBootstrap':
+      return { user: STATE.user, teams: MOCK_DB.teams, currentWeekId: mockWeekId() };
+    case 'getWeekData': {
+      const weekId = payload.weekId;
+      if (!payload.teamId || payload.teamId === 'ALL') {
+        // "작성한 팀만 반영": 실제로 저장 이력이 있는 팀만 rows에 포함 (draft로 자동저장만 된 것도 포함해 관리자/본인은 볼 수 있게)
+        const rows = MOCK_DB.teams.map(t => MOCK_DB.weekly[weekId + '_' + t.team_id]).filter(Boolean);
+        return { weekId, rows, locked:false, pastDeadline:false };
       }
-
-      cell.addEventListener('click', function(k){
-        return function(){ selectedDateKey = k; renderEventEditor(); };
-      }(key));
-
-      grid.appendChild(cell);
+      const key = weekId + '_' + payload.teamId;
+      const record = MOCK_DB.weekly[key] || { record_id:key, week_id:weekId, team_id:payload.teamId, content_html:'', status:'draft', admin_comment:'', deadline_override:'' };
+      return { weekId, record, locked:false, pastDeadline:false };
     }
+    case 'saveWeekData': {
+      const key = payload.weekId + '_' + payload.teamId;
+      const prev = MOCK_DB.weekly[key] || {};
+      const record = { record_id:key, week_id:payload.weekId, team_id:payload.teamId, content_html:payload.contentHtml,
+        status:payload.status || prev.status || 'draft', updated_by: STATE.user.email, updated_at:new Date().toISOString(),
+        admin_comment: prev.admin_comment || '', deadline_override: prev.deadline_override || '' };
+      MOCK_DB.weekly[key] = record;
+      if (payload.status === 'submitted') logActivity('저장(제출)', `${payload.teamId} · ${payload.weekId}`);
+      return record;
+    }
+    case 'loadPrevWeek':
+      return { prevWeekId:'demo-week-prev', content_html:'<p><em>(테스트 모드) 지난주 예시 내용입니다.</em></p>' };
+    case 'getCalendar': {
+      const teamId = payload.teamId;
+      if (!teamId || teamId === 'ALL') return MOCK_DB.calendar;
+      return MOCK_DB.calendar.filter(e => e.team_id === teamId || e.team_id === 'ALL');
+    }
+    case 'addEvent': {
+      const ev = { event_id:'e'+Date.now(), title:payload.title, team_id:payload.teamId||'ALL', tag:payload.tag||'기타',
+        start_date:payload.startDate, end_date:payload.endDate, is_longterm:!!payload.isLongterm, description:payload.description||'' };
+      MOCK_DB.calendar.push(ev);
+      return ev;
+    }
+    case 'updateEvent': {
+      const ev = MOCK_DB.calendar.find(e => e.event_id === payload.eventId);
+      if (ev) ev.title = payload.title;
+      return ev;
+    }
+    case 'getArchiveList': return MOCK_DB.archive;
+    case 'adminResendReminder': {
+      const submitted = MOCK_DB.teams.filter(t => MOCK_DB.weekly[mockWeekId()+'_'+t.team_id]).map(t=>t.team_id);
+      const targets = MOCK_DB.teams.filter(t=>!submitted.includes(t.team_id)).map(t=>t.team_id);
+      logActivity('독촉 메일 재발송', targets.length ? targets.join(', ') : '대상 없음');
+      return { remindedTeams: targets };
+    }
+    case 'adminExtendDeadline':
+      logActivity('전체 마감 연장', `${payload.weekId} → ${payload.newDeadlineIso}`);
+      return { weekId: payload.weekId, deadline_at: payload.newDeadlineIso };
+    case 'adminExtendTeamDeadline': {
+      const key = payload.weekId + '_' + payload.teamId;
+      const rec = MOCK_DB.weekly[key] || { record_id:key, week_id:payload.weekId, team_id:payload.teamId, content_html:'', status:'draft', admin_comment:'' };
+      rec.deadline_override = payload.newDeadlineIso;
+      MOCK_DB.weekly[key] = rec;
+      logActivity('팀별 마감 연장', `${payload.teamId} · ${payload.weekId} → ${payload.newDeadlineIso}`);
+      return rec;
+    }
+    case 'adminComment': {
+      const key = payload.weekId + '_' + payload.teamId;
+      const rec = MOCK_DB.weekly[key] || { record_id:key, week_id:payload.weekId, team_id:payload.teamId, content_html:'', status:'draft', deadline_override:'' };
+      rec.admin_comment = payload.comment;
+      MOCK_DB.weekly[key] = rec;
+      logActivity('코멘트 등록', `${payload.teamId} · ${payload.weekId}`);
+      return rec;
+    }
+    case 'getActivityLog':
+      return MOCK_DB.activityLog.slice(0, payload.limit || 15);
+    case 'adminApprove': {
+      let arc = MOCK_DB.archive.find(a => a.week_id === payload.weekId);
+      if (!arc) { arc = { week_id: payload.weekId }; MOCK_DB.archive.unshift(arc); }
+      arc.approved_by = STATE.user.email; arc.all_submitted = true;
+      logActivity('최종 승인', payload.weekId);
+      return arc;
+    }
+    default: return {};
   }
+}
 
-  function renderEventEditor(){
-    var box = document.getElementById('calEventEditor');
-    box.innerHTML = '';
-    if(!selectedDateKey) return;
-    var wrap = el('div','event-note');
-    var parts = selectedDateKey.split('-');
-    var label = el('span','cal-day-label', parts[1]+'월 '+parts[2]+'일 일정');
-    wrap.appendChild(label);
-    var input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = '일정을 입력하세요 (예: 지구의 날, EPC CBM)';
-    input.value = state.calEvents[selectedDateKey] || '';
-    input.addEventListener('input', function(){
-      state.calEvents[selectedDateKey] = input.value;
-      save();
-      renderCalendar();
-    });
-    wrap.appendChild(input);
-    box.appendChild(wrap);
+document.getElementById('demoBtn').onclick = async () => {
+  STATE.idToken = 'demo-token';
+  const data = await api('login');
+  STATE.user = data.user;
+  await bootstrapApp();
+};
+
+/* ---------------- 로그인 ---------------- */
+window.onload = () => {
+  try {
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleSignIn });
+    google.accounts.id.renderButton(document.getElementById('googleSignInBtn'), { theme:'outline', size:'large', text:'signin_with', shape:'pill' });
+  } catch (e) {
+    document.getElementById('googleSignInBtn').innerHTML =
+      '<span style="font-size:12px;color:var(--gray-sub);">(구글 로그인 버튼을 불러오지 못했습니다 — 실제 배포 시 Client ID를 확인하세요)</span>';
   }
-
-  document.getElementById('prevMonth').addEventListener('click', function(){
-    calDate.setMonth(calDate.getMonth()-1); renderCalendar();
-  });
-  document.getElementById('nextMonth').addEventListener('click', function(){
-    calDate.setMonth(calDate.getMonth()+1); renderCalendar();
-  });
-
-  /* ---------------- Annual events ---------------- */
-  function renderAnnual(){
-    var box = document.getElementById('annualList');
-    box.innerHTML = '';
-    Object.keys(state.annual).forEach(function(month){
-      var group = el('div','annual-month');
-      group.appendChild(el('div','annual-month-title', month));
-      var arr = state.annual[month];
-
-      function renderItems(){
-        var existing = group.querySelectorAll('.annual-item, .add-annual');
-        existing.forEach(function(n){ n.remove(); });
-        arr.forEach(function(val, idx){
-          var row = el('div','annual-item');
-          row.appendChild(el('span','bar'));
-          var input = document.createElement('input');
-          input.type = 'text';
-          input.value = val;
-          input.placeholder = '행사명';
-          input.addEventListener('input', function(){ arr[idx] = input.value; save(); });
-          var rm = el('button','item-remove','✕');
-          rm.type = 'button';
-          rm.addEventListener('click', function(){ arr.splice(idx,1); save(); renderItems(); });
-          row.appendChild(input);
-          row.appendChild(rm);
-          group.appendChild(row);
-        });
-        var addBtn = el('button','add-annual','+ 추가');
-        addBtn.type = 'button';
-        addBtn.addEventListener('click', function(){ arr.push(''); save(); renderItems(); });
-        group.appendChild(addBtn);
-      }
-      renderItems();
-      box.appendChild(group);
-    });
+};
+async function onGoogleSignIn(response) {
+  STATE.idToken = response.credential;
+  try {
+    const data = await api('login');
+    STATE.user = data.user;
+    await bootstrapApp();
+  } catch (err) {
+    const el = document.getElementById('loginError');
+    el.style.display = 'block'; el.textContent = err.message;
   }
+}
+document.getElementById('logoutBtn').onclick = () => {
+  STATE = { ...STATE, idToken:null, user:null };
+  document.getElementById('appScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+};
 
-  /* ---------------- Toast ---------------- */
-  var toastTimer;
-  function showToast(msg){
-    var t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+/* ---------------- 부트스트랩 ---------------- */
+async function bootstrapApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display = 'flex';
+  document.getElementById('userNameLabel').textContent = STATE.user.name + (STATE.user.role === 'admin' ? ' (관리자)' : '');
+  document.getElementById('navAdmin').style.display = STATE.user.role === 'admin' ? '' : 'none';
+
+  const boot = await api('getBootstrap');
+  STATE.teams = boot.teams;
+  STATE.currentWeekId = boot.currentWeekId;
+
+  setupNav();
+  gotoPage('home');
+}
+
+/* ---------------- 네비게이션 ---------------- */
+function setupNav() {
+  document.querySelectorAll('.nav-link[data-page]').forEach(el => {
+    el.onclick = () => gotoPage(el.dataset.page);
+  });
+  document.querySelector('.topnav-brand').onclick = () => gotoPage('home');
+  document.querySelectorAll('[data-goto]').forEach(el => {
+    el.onclick = () => gotoPage(el.dataset.goto);
+  });
+  document.getElementById('navPresentation').onclick = () => openPresentation(STATE.currentWeekId);
+  document.getElementById('navArchive').onclick = openArchiveModal;
+}
+
+async function gotoPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  document.querySelectorAll('.nav-link[data-page]').forEach(el => el.classList.toggle('active', el.dataset.page === pageId));
+  STATE.currentPage = pageId;
+  if (pageId !== 'write' && typeof stopAutosave === 'function') stopAutosave();
+
+  if (pageId === 'home') await loadHome();
+  if (pageId === 'calendar') await loadReadonlyCalendar();
+  if (pageId === 'write') showWriteDepth1();
+  if (pageId === 'admin') await loadAdminPage();
+}
+
+/* ---------------- 공통: D-Day 렌더러 ---------------- */
+function renderDday(containerEl, events, editable) {
+  if (!events.length) {
+    containerEl.innerHTML = '<span style="font-size:12px;color:var(--gray-sub);">표시할 중장기 일정이 없습니다.</span>';
+    return;
   }
+  const today = new Date(); today.setHours(0,0,0,0);
+  containerEl.innerHTML = events.map(ev => {
+    const target = new Date(ev.start_date); target.setHours(0,0,0,0);
+    const diffDays = Math.round((target - today) / 86400000);
+    let ddayLabel, ddayColor;
+    if (diffDays > 0) { ddayLabel = 'D-' + diffDays; ddayColor = diffDays <= 7 ? 'var(--accent)' : 'var(--ink)'; }
+    else if (diffDays === 0) { ddayLabel = 'D-DAY'; ddayColor = 'var(--accent)'; }
+    else { ddayLabel = 'D+' + Math.abs(diffDays); ddayColor = 'var(--gray-sub)'; }
+    const teamName = (STATE.teams.find(t => t.team_id === ev.team_id) || { team_name:'전사 공통' }).team_name;
+    const titleHtml = editable
+      ? `<input class="dday-title-input" value="${ev.title.replace(/"/g,'&quot;')}" data-event-id="${ev.event_id}" onchange="onDdayTitleEdit(this)" />`
+      : `<span class="dday-title-static">${ev.title}</span>`;
+    return `<div class="dday-card">
+      <span class="dday-badge" style="color:${ddayColor};">${ddayLabel}</span>
+      ${titleHtml}
+      <div class="dday-meta">
+        <span class="dday-team-tag">${teamName}</span>
+        <span class="dday-tag-label" style="color:${TAG_COLORS[ev.tag]||'#888'};">${ev.tag}</span>
+        <span>${ev.start_date}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+async function onDdayTitleEdit(inputEl) {
+  const eventId = inputEl.dataset.eventId;
+  const newTitle = inputEl.value.trim();
+  if (!newTitle) return;
+  await api('updateEvent', { eventId, title:newTitle });
+}
 
-  document.getElementById('submitBtn').addEventListener('click', function(){
-    save();
-    showToast('이번 주 Weekly 자료가 제출되었습니다.');
-  });
-  document.getElementById('printBtn').addEventListener('click', function(){
-    window.print();
-  });
+async function addEventFlow(teamId, onDone) {
+  const title = prompt('일정명을 입력하세요');
+  if (!title) return;
+  const startDate = prompt('시작일 (YYYY-MM-DD)');
+  if (!startDate) return;
+  const endDate = prompt('종료일 (YYYY-MM-DD)', startDate);
+  const tag = prompt('태그 (출장/포럼/휴무일/공식회의/기타)', '기타');
+  const isLongterm = confirm('D-Day 주요 일정에도 표시할까요?');
+  await api('addEvent', { title, startDate, endDate, tag, isLongterm, teamId });
+  onDone();
+}
 
-  /* ---------------- Init ---------------- */
-  renderWeekLabel();
-  renderOrg();
-  renderLabs();
-  renderCalendar();
-  renderAnnual();
-  if(state.lastSaved){
-    document.getElementById('savedAt').textContent = '마지막 저장 · ' + new Date(state.lastSaved).toLocaleTimeString('ko-KR');
+/* ---------------- 홈 ---------------- */
+function nextThursday16() {
+  const now = new Date();
+  const d = new Date(now);
+  const diff = (4 - now.getDay() + 7) % 7; // 4 = 목요일
+  d.setDate(now.getDate() + diff);
+  d.setHours(16, 0, 0, 0);
+  if (d <= now) d.setDate(d.getDate() + 7);
+  return d;
+}
+async function loadHome() {
+  // 내 팀 작성 현황 (본인 팀만 - 관리자는 전체 현황 대신 안내 문구)
+  const myTeamId = STATE.user.team_id;
+  const myTeam = STATE.teams.find(t => t.team_id === myTeamId);
+  const myTeamStatusEl = document.getElementById('myTeamStatus');
+  if (myTeam) {
+    const data = await api('getWeekData', { weekId: STATE.currentWeekId, teamId: myTeamId });
+    const map = { draft:['작성중','badge-draft'], submitted:['제출완료','badge-submitted'], locked:['마감','badge-locked'] };
+    const [label, cls] = map[data.record.status || 'draft'];
+    myTeamStatusEl.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <span style="font-size:16px;font-weight:800;">${myTeam.team_name}</span>
+        <span class="badge ${cls}">${label}</span>
+      </div>
+      <button class="btn btn-primary" data-goto-team="${myTeamId}">이어서 작성하기</button>
+      <div class="mini-history" id="miniHistory"></div>
+      <div class="mini-history-label">최근 4주 제출 이력</div>`;
+    myTeamStatusEl.querySelector('[data-goto-team]').onclick = async () => {
+      await gotoPage('write');
+      enterWriteDepth2(myTeamId);
+    };
+    await renderMiniHistory(myTeamId);
   } else {
-    document.getElementById('savedAt').textContent = '자동 저장 대기 중';
+    myTeamStatusEl.innerHTML = `<p style="font-size:12.5px;color:var(--gray-sub);">전체 팀별 제출 현황은 관리자 페이지에서 확인할 수 있습니다.</p>`;
   }
-})();
+
+  document.getElementById('homeDeadline').textContent =
+    nextThursday16().toLocaleString('ko-KR', { month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  const events = await api('getCalendar', { teamId:'ALL' });
+  const upcoming = events.filter(e => e.is_longterm)
+    .sort((a,b) => new Date(a.start_date) - new Date(b.start_date)).slice(0,3);
+  renderDday(document.getElementById('homeDdayList'), upcoming, false);
+}
+
+// 내 작성 히스토리 미니 타임라인 (최근 4주) - 데모용으로 고정 주차 4개를 사용합니다.
+// 실배포 시에는 Code.gs의 getPrevWeekId_()를 체이닝해 실제 ISO 주차 4개를 계산해서 넘기면 됩니다.
+const DEMO_LAST4_WEEKS = [
+  { id:'2026-W30', label:'-3주' }, { id:'2026-W31', label:'-2주' },
+  { id:'2026-W32', label:'-1주' }, { id:'demo-week', label:'이번주' }
+];
+async function renderMiniHistory(teamId) {
+  const el = document.getElementById('miniHistory');
+  if (!el) return;
+  const results = await Promise.all(DEMO_LAST4_WEEKS.map(w => api('getWeekData', { weekId:w.id, teamId })));
+  el.innerHTML = DEMO_LAST4_WEEKS.map((w, i) => {
+    const done = results[i].record.status === 'submitted' || results[i].record.status === 'locked';
+    return `<span class="dot ${done ? 'done' : 'empty'}" title="${w.label} (${w.id}) · ${done ? '제출' : '미제출'}"></span>`;
+  }).join('');
+}
+
+/* 캘린더 이벤트칩 스타일러: 배경 대신 왼쪽 바 컬러만 적용 (공통 함수) */
+function styleEventEl(info) {
+  const c = TAG_COLORS[info.event.extendedProps.tag] || '#888';
+  info.el.style.setProperty('--tag-color', c);
+}
+
+/* ---------------- 캘린더 & 일정 (조회 전용) ---------------- */
+let roCalendarInstance = null;
+async function loadReadonlyCalendar() {
+  const events = await api('getCalendar', { teamId:'ALL' });
+  const fcEvents = events.map(ev => ({ title:ev.title, start:ev.start_date, end:ev.end_date,
+    extendedProps:{ tag:ev.tag, description:ev.description } }));
+  const el = document.getElementById('roCalendarEl');
+  if (roCalendarInstance) roCalendarInstance.destroy();
+  roCalendarInstance = new FullCalendar.Calendar(el, {
+    initialView:'dayGridMonth', height:420,
+    headerToolbar:{ left:'prev,next today', center:'title', right:'dayGridMonth,dayGridWeek' },
+    events: fcEvents, dayCellClassNames, eventDidMount: styleEventEl,
+    eventClick:(info) => alert(`${info.event.title}\n태그: ${info.event.extendedProps.tag}\n${info.event.extendedProps.description||''}`)
+  });
+  roCalendarInstance.render();
+  renderDday(document.getElementById('roDdayEl'), events.filter(e => e.is_longterm), false);
+}
+
+/* ---------------- 회의자료 작성: 1뎁스(팀 목록) ---------------- */
+function showWriteDepth1() {
+  document.getElementById('writeDepth1').style.display = 'block';
+  document.getElementById('writeDepth2').style.display = 'none';
+  loadWriteTeamGrid();
+}
+async function loadWriteTeamGrid() {
+  const data = await api('getWeekData', { weekId: STATE.currentWeekId, teamId:'ALL' });
+  const grid = document.getElementById('writeTeamGrid');
+  grid.innerHTML = STATE.teams.map(t => {
+    const row = data.rows.find(r => r.team_id === t.team_id);
+    const status = row ? row.status : 'draft';
+    const map = { draft:['작성중','badge-draft'], submitted:['제출완료','badge-submitted'], locked:['마감','badge-locked'] };
+    const [label, cls] = map[status];
+    return `<div class="team-card" data-team="${t.team_id}">
+      <div class="lab-tag">${t.lab}</div>
+      <div class="team-name">${t.team_name}</div>
+      <span class="badge ${cls}">${label}</span>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.team-card').forEach(el => {
+    el.onclick = () => enterWriteDepth2(el.dataset.team);
+  });
+}
+
+/* ---------------- 회의자료 작성: 2뎁스(팀별 작성) ---------------- */
+let teamCalendarInstance = null;
+let autosaveTimer = null;
+let currentRecordStatus = 'draft';
+
+async function enterWriteDepth2(teamId) {
+  STATE.writeTeamId = teamId;
+  document.getElementById('writeDepth1').style.display = 'none';
+  document.getElementById('writeDepth2').style.display = 'block';
+  const team = STATE.teams.find(t => t.team_id === teamId);
+  document.getElementById('writeTeamTitle').textContent = team.team_name + ' 작성';
+
+  await loadTeamCalendar(teamId);
+  await loadEditor(teamId);
+  startAutosave();
+}
+document.getElementById('btnBackToTeams').onclick = () => { stopAutosave(); showWriteDepth1(); };
+
+async function loadTeamCalendar(teamId) {
+  const events = await api('getCalendar', { teamId });
+  const fcEvents = events.map(ev => ({ title:ev.title, start:ev.start_date, end:ev.end_date,
+    extendedProps:{ tag:ev.tag, description:ev.description } }));
+  const el = document.getElementById('teamCalendarEl');
+  if (teamCalendarInstance) teamCalendarInstance.destroy();
+  teamCalendarInstance = new FullCalendar.Calendar(el, {
+    initialView:'dayGridMonth', height:380,
+    headerToolbar:{ left:'prev,next today', center:'title', right:'dayGridMonth,dayGridWeek' },
+    events: fcEvents, dayCellClassNames, eventDidMount: styleEventEl,
+    eventClick:(info) => alert(`${info.event.title}\n태그: ${info.event.extendedProps.tag}\n${info.event.extendedProps.description||''}`)
+  });
+  teamCalendarInstance.render();
+  renderDday(document.getElementById('teamDdayEl'), events.filter(e => e.is_longterm), true);
+}
+document.getElementById('btnAddEventTeam').onclick = () => addEventFlow(STATE.writeTeamId, () => loadTeamCalendar(STATE.writeTeamId));
+
+// 표(Table) 삽입 모듈 등록 - Quill 코어에 없는 기능이라 quill-better-table을 별도 등록합니다.
+if (window.QuillBetterTable) {
+  Quill.register({ 'modules/better-table': QuillBetterTable }, true);
+}
+async function loadEditor(teamId) {
+  if (!STATE.quill) {
+    STATE.quill = new Quill('#editor', {
+      theme:'snow',
+      modules:{
+        toolbar:[[{ header:[false,3,4] }], ['bold','italic','underline'], [{ color:[] }, { background:[] }],
+          [{ list:'ordered' }, { list:'bullet' }], ['image','link'], ['clean']],
+        table: false, // 기본 table 모듈 끄고 better-table로 대체
+        'better-table': {
+          operationMenu:{ items:{
+            insertColumnRight:{ text:'오른쪽에 열 추가' }, insertColumnLeft:{ text:'왼쪽에 열 추가' },
+            insertRowUp:{ text:'위에 행 추가' }, insertRowDown:{ text:'아래에 행 추가' },
+            deleteColumn:{ text:'열 삭제' }, deleteRow:{ text:'행 삭제' }, deleteTable:{ text:'표 삭제' }
+          } }
+        },
+        keyboard:{ bindings: window.QuillBetterTable ? QuillBetterTable.keyboardBindings : {} }
+      }
+    });
+  }
+  const data = await api('getWeekData', { weekId: STATE.currentWeekId, teamId });
+  STATE.quill.root.innerHTML = data.record.content_html || '';
+  currentRecordStatus = data.record.status || 'draft';
+  setStatusBadge(currentRecordStatus);
+
+  // 관리자는 마감 여부와 무관하게 항상 수정 가능. 마감이 지났는데 관리자로 들어온 경우에만 배너로 안내.
+  const isAdmin = STATE.user.role === 'admin';
+  const readOnly = data.locked && !isAdmin;
+  STATE.quill.enable(!readOnly);
+  document.getElementById('btnSave').disabled = readOnly;
+  document.getElementById('btnSave').style.opacity = readOnly ? .5 : 1;
+  document.getElementById('adminBanner').style.display = (data.pastDeadline && isAdmin) ? 'block' : 'none';
+
+  // 관리자가 남긴 코멘트가 있으면 배너로 표시
+  const commentBanner = document.getElementById('commentBanner');
+  if (data.record.admin_comment) {
+    commentBanner.style.display = 'block';
+    commentBanner.innerHTML = `<b>관리자 코멘트</b> · ${data.record.admin_comment}`;
+  } else {
+    commentBanner.style.display = 'none';
+  }
+  document.getElementById('autosaveIndicator').textContent = '';
+}
+function setStatusBadge(status) {
+  const badge = document.getElementById('writeStatusBadge');
+  const map = { draft:['작성중','badge-draft'], submitted:['제출완료','badge-submitted'], locked:['마감(잠금)','badge-locked'] };
+  const [label, cls] = map[status] || map.draft;
+  badge.textContent = label; badge.className = 'badge ' + cls;
+}
+document.getElementById('btnSave').onclick = async () => {
+  try {
+    const record = await api('saveWeekData', { weekId: STATE.currentWeekId, teamId: STATE.writeTeamId,
+      contentHtml: STATE.quill.root.innerHTML, status:'submitted' });
+    currentRecordStatus = record.status;
+    setStatusBadge(record.status);
+    alert('저장되었습니다.');
+  } catch (err) { alert(err.message); }
+};
+document.getElementById('btnLoadPrev').onclick = async () => {
+  const data = await api('loadPrevWeek', { weekId: STATE.currentWeekId, teamId: STATE.writeTeamId });
+  if (!data.content_html) { alert('지난 주 작성 내용이 없습니다.'); return; }
+  if (confirm('지난 주 내용을 현재 에디터에 삽입할까요? (기존 내용에 추가됩니다)')) {
+    STATE.quill.root.innerHTML += data.content_html;
+  }
+};
+document.getElementById('btnInsertTable').onclick = () => {
+  if (!window.QuillBetterTable) { alert('표 삽입 모듈을 불러오지 못했습니다. 인터넷 연결을 확인해주세요.'); return; }
+  const rows = parseInt(prompt('행(row) 개수', '3'), 10) || 3;
+  const cols = parseInt(prompt('열(column) 개수', '3'), 10) || 3;
+  const tableModule = STATE.quill.getModule('better-table');
+  tableModule.insertTable(rows, cols);
+};
+document.getElementById('btnTemplate').onclick = () => {
+  const isEmpty = STATE.quill.getText().trim().length === 0;
+  if (!isEmpty && !confirm('현재 작성 중인 내용이 있습니다. 기본 템플릿을 뒤에 추가할까요?')) return;
+  STATE.quill.root.innerHTML += AGENDA_TEMPLATE;
+};
+
+/* ---------------- 자동저장 (Auto-Save) ----------------
+ * 작성 중 상태(draft)만 자동으로 저장하고, 상태를 'submitted'로 바꾸지는 않습니다.
+ * '제출' 여부는 반드시 '저장' 버튼을 눌러야 확정됩니다. */
+function startAutosave() {
+  stopAutosave();
+  autosaveTimer = setInterval(async () => {
+    if (!STATE.quill || document.getElementById('btnSave').disabled) return;
+    try {
+      await api('saveWeekData', { weekId: STATE.currentWeekId, teamId: STATE.writeTeamId,
+        contentHtml: STATE.quill.root.innerHTML, status: currentRecordStatus });
+      const now = new Date();
+      document.getElementById('autosaveIndicator').textContent =
+        `자동저장됨 · ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+    } catch (e) { /* 자동저장 실패는 조용히 무시 (다음 주기에 재시도) */ }
+  }, 45000);
+}
+function stopAutosave() {
+  if (autosaveTimer) { clearInterval(autosaveTimer); autosaveTimer = null; }
+}
+
+/* ---------------- 다른 팀 최근 내용 보기 (읽기 전용) ---------------- */
+document.getElementById('btnOtherTeams').onclick = async () => {
+  const data = await api('getWeekData', { weekId: STATE.currentWeekId, teamId:'ALL' });
+  const modal = document.getElementById('otherTeamsModal');
+  const list = document.getElementById('otherTeamsList');
+  const preview = document.getElementById('otherTeamPreview');
+  preview.style.display = 'none';
+  list.innerHTML = STATE.teams.filter(t => t.team_id !== STATE.writeTeamId).map(t => {
+    const row = data.rows.find(r => r.team_id === t.team_id);
+    const submitted = row && (row.status === 'submitted' || row.status === 'locked');
+    return `<div class="archive-row" style="cursor:${submitted ? 'pointer' : 'default'};" data-team="${t.team_id}">
+      <div><div class="archive-week">${t.team_name}</div><div class="archive-status">${submitted ? '제출완료 · 클릭해서 보기' : '아직 제출 전'}</div></div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-team]').forEach(el => {
+    el.onclick = () => {
+      const row = data.rows.find(r => r.team_id === el.dataset.team);
+      if (!row || !(row.status === 'submitted' || row.status === 'locked')) return;
+      preview.style.display = 'block';
+      preview.innerHTML = row.content_html;
+    };
+  });
+  modal.style.display = 'flex';
+};
+document.getElementById('otherTeamsCloseBtn').onclick = () => { document.getElementById('otherTeamsModal').style.display = 'none'; };
+
+/* ---------------- 관리자 ---------------- */
+async function loadAdminPage() {
+  const data = await api('getWeekData', { weekId: STATE.currentWeekId, teamId:'ALL' });
+  const submittedCount = STATE.teams.filter(t => {
+    const row = data.rows.find(r => r.team_id === t.team_id);
+    return row && (row.status === 'submitted' || row.status === 'locked');
+  }).length;
+  const rate = Math.round((submittedCount / STATE.teams.length) * 100);
+  document.getElementById('rateNumber').textContent = rate + '%';
+  document.getElementById('rateBarFill').style.width = rate + '%';
+  document.getElementById('rateSubLabel').textContent = `${submittedCount} / ${STATE.teams.length}팀 제출 완료`;
+
+  const list = document.getElementById('adminSummaryList');
+  list.innerHTML = STATE.teams.map(t => {
+    const row = data.rows.find(r => r.team_id === t.team_id);
+    const status = row ? row.status : 'draft';
+    const map = { draft:['작성중','badge-draft'], submitted:['제출완료','badge-submitted'], locked:['마감','badge-locked'] };
+    const [label, cls] = map[status];
+    return `<div class="admin-team-row">
+      <span>${t.team_name}</span>
+      <span class="badge ${cls}">${label}</span>
+      <span class="row-actions">
+        <button class="btn" data-comment="${t.team_id}">코멘트</button>
+        <button class="btn" data-extend="${t.team_id}">마감연장</button>
+      </span>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('[data-comment]').forEach(el => {
+    el.onclick = async () => {
+      const teamId = el.dataset.comment;
+      const comment = prompt(`${teamId} 팀에 남길 코멘트를 입력하세요`);
+      if (!comment) return;
+      await api('adminComment', { weekId: STATE.currentWeekId, teamId, comment });
+      alert('코멘트가 등록되었습니다. 해당 팀이 작성 화면에 들어오면 표시됩니다.');
+      loadAdminPage();
+    };
+  });
+  list.querySelectorAll('[data-extend]').forEach(el => {
+    el.onclick = async () => {
+      const teamId = el.dataset.extend;
+      const newTime = prompt(`${teamId} 팀만 연장할 마감 일시를 입력하세요 (예: 2026-08-20T18:00)`);
+      if (!newTime) return;
+      await api('adminExtendTeamDeadline', { weekId: STATE.currentWeekId, teamId, newDeadlineIso:newTime });
+      alert(`${teamId} 팀의 마감이 연장되었습니다: ${newTime}`);
+      loadAdminPage();
+    };
+  });
+
+  const logs = await api('getActivityLog', { limit:15 });
+  const logListEl = document.getElementById('activityLogList');
+  logListEl.innerHTML = logs.length ? logs.map(l => {
+    const t = new Date(l.timestamp);
+    const timeLabel = `${t.getMonth()+1}/${t.getDate()} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`;
+    return `<div class="log-row"><span><b>${l.action}</b> · ${l.detail}</span><span class="log-meta">${l.actor} · ${timeLabel}</span></div>`;
+  }).join('') : '<p style="font-size:12px;color:var(--gray-sub);">아직 활동 기록이 없습니다.</p>';
+}
+document.getElementById('btnResendReminder').onclick = async () => {
+  const data = await api('adminResendReminder');
+  alert('독촉 메일을 재발송했습니다.\n대상 팀: ' + (data.remindedTeams.length ? data.remindedTeams.join(', ') : '없음(전체 제출 완료)'));
+  loadAdminPage();
+};
+document.getElementById('btnExtendDeadline').onclick = async () => {
+  const newTime = prompt('전체 마감을 연장할 일시를 입력하세요 (예: 2026-08-20T18:00)');
+  if (!newTime) return;
+  await api('adminExtendDeadline', { weekId: STATE.currentWeekId, newDeadlineIso:newTime });
+  alert('전체 마감 시간이 연장되었습니다: ' + newTime);
+  loadAdminPage();
+};
+document.getElementById('btnExtendTeamDeadline').onclick = async () => {
+  const teamId = prompt('연장할 팀 코드를 입력하세요 (예: SPC, HR, PLAN 등)');
+  if (!teamId) return;
+  const newTime = prompt(`${teamId} 팀 마감 연장 일시를 입력하세요 (예: 2026-08-20T18:00)`);
+  if (!newTime) return;
+  await api('adminExtendTeamDeadline', { weekId: STATE.currentWeekId, teamId, newDeadlineIso:newTime });
+  alert(`${teamId} 팀의 마감이 연장되었습니다: ${newTime}`);
+  loadAdminPage();
+};
+document.getElementById('btnApproveWeek').onclick = async () => {
+  if (!confirm('이번 주 회의자료를 최종 승인하시겠습니까?')) return;
+  await api('adminApprove', { weekId: STATE.currentWeekId, allSubmitted:true });
+  alert('최종 승인되었습니다.');
+  loadAdminPage();
+};
+
+/* ---------------- 여러 주차 일괄 내보내기 ---------------- */
+document.getElementById('btnBulkExport').onclick = async () => {
+  const list = await api('getArchiveList');
+  const el = document.getElementById('bulkExportList');
+  el.innerHTML = list.map(a => `
+    <label style="display:flex; align-items:center; gap:8px; padding:8px 0; font-size:12.5px; cursor:pointer;">
+      <input type="checkbox" value="${a.week_id}" /> ${a.week_id} ${a.all_submitted ? '(전체 제출완료)' : '(일부 미제출)'}
+    </label>`).join('') || '<p style="font-size:12px;color:var(--gray-sub);">지난 자료가 없습니다.</p>';
+  document.getElementById('bulkExportModal').style.display = 'flex';
+};
+document.getElementById('bulkExportCloseBtn').onclick = () => { document.getElementById('bulkExportModal').style.display = 'none'; };
+document.getElementById('bulkExportConfirmBtn').onclick = async () => {
+  const checked = Array.from(document.querySelectorAll('#bulkExportList input:checked')).map(el => el.value);
+  if (!checked.length) { alert('내보낼 주차를 하나 이상 선택해주세요.'); return; }
+  document.getElementById('bulkExportModal').style.display = 'none';
+
+  const area = document.getElementById('printArea');
+  document.getElementById('presentationWeekLabel').textContent = `${checked.length}개 주차 일괄`;
+  let combined = '';
+  for (const weekId of checked) {
+    const weekData = await api('getWeekData', { weekId, teamId:'ALL' });
+    const rows = weekData.rows.filter(r => r.status === 'submitted' || r.status === 'locked');
+    const teamBlocks = rows.map(r => {
+      const team = STATE.teams.find(t => t.team_id === r.team_id);
+      return `<div class="p-team-block"><div class="p-team-title">${team ? team.team_name : r.team_id}</div><div class="p-content">${r.content_html}</div></div>`;
+    }).join('') || '<p style="color:#aaa;">제출된 자료가 없습니다.</p>';
+    combined += `<div class="p-section"><div class="p-section-title">📁 ${weekId}</div>${teamBlocks}</div>`;
+  }
+  area.innerHTML = combined;
+  document.getElementById('presentationScreen').style.display = 'block';
+};
+
+/* ---------------- Presentation / Print Mode (캘린더+D-Day 포함) ---------------- */
+async function openPresentation(weekId) {
+  const [weekData, events] = await Promise.all([
+    api('getWeekData', { weekId, teamId:'ALL' }),
+    api('getCalendar', { teamId:'ALL' })
+  ]);
+  const area = document.getElementById('printArea');
+  document.getElementById('presentationWeekLabel').textContent = weekId;
+
+  const eventListHtml = events.length
+    ? events.slice(0,8).map(ev => `<div class="p-event-row"><span>${ev.title} <span style="color:${TAG_COLORS[ev.tag]||'#888'};font-weight:700;">· ${ev.tag}</span></span><span>${ev.start_date}${ev.end_date && ev.end_date!==ev.start_date ? ' ~ '+ev.end_date : ''}</span></div>`).join('')
+    : '<p style="color:#aaa;">등록된 일정이 없습니다.</p>';
+
+  const ddayArea = document.createElement('div');
+  renderDday(ddayArea, events.filter(e => e.is_longterm), false);
+
+  // "작성한 팀만 자료에 반영": draft(작성 중) 상태는 제외하고, 실제로 제출/마감된 팀만 노출
+  const submittedRows = weekData.rows.filter(r => r.status === 'submitted' || r.status === 'locked');
+  const teamBlocks = submittedRows.map(r => {
+    const team = STATE.teams.find(t => t.team_id === r.team_id);
+    return `<div class="p-team-block">
+      <div class="p-team-title">${team ? team.team_name : r.team_id}</div>
+      <div class="p-content">${r.content_html}</div>
+    </div>`;
+  }).join('') || '<p style="color:#aaa;">이번 주 제출된 자료가 없습니다.</p>';
+
+  area.innerHTML = `
+    <div class="p-section">
+      <div class="p-section-title">📅 주요 일정</div>
+      ${eventListHtml}
+    </div>
+    <div class="p-section">
+      <div class="p-section-title">⏱ 중장기 주요 일정 (D-Day)</div>
+      ${ddayArea.innerHTML}
+    </div>
+    <div class="p-section">
+      <div class="p-section-title">📝 팀별 회의 안건 (제출완료 ${submittedRows.length}팀)</div>
+      ${teamBlocks}
+    </div>
+  `;
+  document.getElementById('presentationScreen').style.display = 'block';
+}
+document.getElementById('exitPresentation').onclick = () => { document.getElementById('presentationScreen').style.display = 'none'; };
+document.getElementById('printBtn').onclick = () => window.print();
+
+/* ---------------- Archive ---------------- */
+async function openArchiveModal() {
+  const list = await api('getArchiveList');
+  const modal = document.getElementById('archiveModal');
+  const body = document.getElementById('archiveList');
+  body.innerHTML = list.map(a => `
+    <div class="archive-row">
+      <div>
+        <div class="archive-week">${a.week_id}</div>
+        <div class="archive-status">${a.all_submitted ? '✅ 전체 제출완료' : '⚠️ 일부 미제출'}${a.approved_by ? ' · 승인: '+a.approved_by : ''}</div>
+      </div>
+      <button class="btn btn-primary" onclick="openArchiveWeek('${a.week_id}')">보기</button>
+    </div>
+  `).join('') || '<p style="color:var(--gray-sub);font-size:12.5px;">기록이 없습니다.</p>';
+  modal.style.display = 'flex';
+}
+document.getElementById('archiveCloseBtn').onclick = () => { document.getElementById('archiveModal').style.display = 'none'; };
+function openArchiveWeek(weekId) {
+  document.getElementById('archiveModal').style.display = 'none';
+  openPresentation(weekId);
+}
 </script>
 </body>
 </html>
