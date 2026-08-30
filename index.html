@@ -870,12 +870,12 @@ async function enterWriteDepth2(teamId) {
     await loadEditor(teamId);
     startAutosave();
   } catch (err) {
-    // Quill 에디터 라이브러리 로드 실패 시 (네트워크/방화벽으로 CDN 차단 등)
-    // 알아보기 힘든 오류 대신 안내 문구를 보여주고, 저장/작성 버튼을 비활성화합니다.
+    // 이 catch는 Quill 자체 생성이 실패한 진짜 심각한 경우에만 걸립니다.
+    // (데이터 불러오기 실패는 loadEditor 내부에서 별도로 처리되어 글쓰기는 계속 가능합니다.)
     document.getElementById('editorWrap').innerHTML =
       '<div style="padding:24px; font-size:13px; color:var(--accent);">' +
-      '⚠️ 글쓰기 도구를 불러오지 못했습니다. 인터넷 연결 상태를 확인하거나, 회사 네트워크가 외부 스크립트(cdnjs.cloudflare.com)를 차단하고 있는지 확인해주세요.<br>' +
-      '페이지를 새로고침한 뒤 다시 시도해주시고, 계속 안 되면 관리자에게 문의해주세요.</div>';
+      `⚠️ 글쓰기 도구를 불러오지 못했습니다. (오류: ${err.message})<br>` +
+      '페이지를 새로고침한 뒤 다시 시도해주시고, 계속 안 되면 이 오류 문구를 그대로 캡처해서 알려주세요.</div>';
     ['btnSave','btnLoadPrev','btnInsertTable','btnTemplate','btnOtherTeams'].forEach(id => {
       const el = document.getElementById(id);
       el.disabled = true; el.style.opacity = .5;
@@ -907,45 +907,60 @@ if (window.QuillBetterTable) {
 }
 async function loadEditor(teamId) {
   if (!STATE.quill) {
-    STATE.quill = new Quill('#editor', {
-      theme:'snow',
-      modules:{
-        toolbar:[[{ header:[false,3,4] }], ['bold','italic','underline'], [{ color:[] }, { background:[] }],
-          [{ list:'ordered' }, { list:'bullet' }], ['image','link'], ['clean']],
-        table: false, // 기본 table 모듈 끄고 better-table로 대체
-        'better-table': {
-          operationMenu:{ items:{
-            insertColumnRight:{ text:'오른쪽에 열 추가' }, insertColumnLeft:{ text:'왼쪽에 열 추가' },
-            insertRowUp:{ text:'위에 행 추가' }, insertRowDown:{ text:'아래에 행 추가' },
-            deleteColumn:{ text:'열 삭제' }, deleteRow:{ text:'행 삭제' }, deleteTable:{ text:'표 삭제' }
-          } }
-        },
-        keyboard:{ bindings: window.QuillBetterTable ? QuillBetterTable.keyboardBindings : {} }
-      }
-    });
+    // 표(Table) 플러그인이 로드되지 않았어도 글쓰기 자체는 항상 가능하도록 분리합니다.
+    const hasBetterTable = !!window.QuillBetterTable;
+    const modules = {
+      toolbar:[[{ header:[false,3,4] }], ['bold','italic','underline'], [{ color:[] }, { background:[] }],
+        [{ list:'ordered' }, { list:'bullet' }], ['image','link'], ['clean']]
+    };
+    if (hasBetterTable) {
+      modules.table = false; // 기본 table 모듈 끄고 better-table로 대체
+      modules['better-table'] = {
+        operationMenu:{ items:{
+          insertColumnRight:{ text:'오른쪽에 열 추가' }, insertColumnLeft:{ text:'왼쪽에 열 추가' },
+          insertRowUp:{ text:'위에 행 추가' }, insertRowDown:{ text:'아래에 행 추가' },
+          deleteColumn:{ text:'열 삭제' }, deleteRow:{ text:'행 삭제' }, deleteTable:{ text:'표 삭제' }
+        } }
+      };
+      modules.keyboard = { bindings: QuillBetterTable.keyboardBindings };
+    }
+    STATE.quill = new Quill('#editor', { theme:'snow', modules });
+    // 표 삽입 플러그인이 없으면 버튼을 숨기고, 있으면 보여줍니다.
+    const tableBtn = document.getElementById('btnInsertTable');
+    if (tableBtn) tableBtn.style.display = hasBetterTable ? '' : 'none';
   }
-  const data = await api('getWeekData', { weekId: STATE.currentWeekId, teamId });
-  STATE.quill.root.innerHTML = data.record.content_html || '';
-  currentRecordStatus = data.record.status || 'draft';
-  setStatusBadge(currentRecordStatus);
 
-  // 관리자는 마감 여부와 무관하게 항상 수정 가능. 마감이 지났는데 관리자로 들어온 경우에만 배너로 안내.
-  const isAdmin = STATE.user.role === 'admin';
-  const readOnly = data.locked && !isAdmin;
-  STATE.quill.enable(!readOnly);
-  document.getElementById('btnSave').disabled = readOnly;
-  document.getElementById('btnSave').style.opacity = readOnly ? .5 : 1;
-  document.getElementById('adminBanner').style.display = (data.pastDeadline && isAdmin) ? 'block' : 'none';
+  // 에디터 자체는 위에서 이미 만들어졌으니, 아래 데이터 불러오기가 실패해도
+  // 글쓰기는 계속 가능하도록 별도 try/catch로 감쌉니다.
+  try {
+    const data = await api('getWeekData', { weekId: STATE.currentWeekId, teamId });
+    STATE.quill.root.innerHTML = data.record.content_html || '';
+    currentRecordStatus = data.record.status || 'draft';
+    setStatusBadge(currentRecordStatus);
 
-  // 관리자가 남긴 코멘트가 있으면 배너로 표시
-  const commentBanner = document.getElementById('commentBanner');
-  if (data.record.admin_comment) {
-    commentBanner.style.display = 'block';
-    commentBanner.innerHTML = `<b>관리자 코멘트</b> · ${data.record.admin_comment}`;
-  } else {
-    commentBanner.style.display = 'none';
+    // 관리자는 마감 여부와 무관하게 항상 수정 가능. 마감이 지났는데 관리자로 들어온 경우에만 배너로 안내.
+    const isAdmin = STATE.user.role === 'admin';
+    const readOnly = data.locked && !isAdmin;
+    STATE.quill.enable(!readOnly);
+    document.getElementById('btnSave').disabled = readOnly;
+    document.getElementById('btnSave').style.opacity = readOnly ? .5 : 1;
+    document.getElementById('adminBanner').style.display = (data.pastDeadline && isAdmin) ? 'block' : 'none';
+
+    // 관리자가 남긴 코멘트가 있으면 배너로 표시
+    const commentBanner = document.getElementById('commentBanner');
+    if (data.record.admin_comment) {
+      commentBanner.style.display = 'block';
+      commentBanner.innerHTML = `<b>관리자 코멘트</b> · ${data.record.admin_comment}`;
+    } else {
+      commentBanner.style.display = 'none';
+    }
+    document.getElementById('autosaveIndicator').textContent = '';
+  } catch (err) {
+    // 기존 내용 불러오기만 실패한 경우: 에디터는 비워둔 채로 계속 작성 가능하게 두고, 원인만 안내합니다.
+    document.getElementById('commentBanner').style.display = 'block';
+    document.getElementById('commentBanner').innerHTML =
+      `<b style="color:var(--accent);">⚠️ 기존 작성 내용을 불러오지 못했습니다</b> (${err.message}) · 새로 작성하시면 저장은 정상적으로 됩니다.`;
   }
-  document.getElementById('autosaveIndicator').textContent = '';
 }
 function setStatusBadge(status) {
   const badge = document.getElementById('writeStatusBadge');
