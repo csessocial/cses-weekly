@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- BUILD-VERSION: 2026-08-30-v3 (이 줄이 안 보이면 예전 파일이 그대로 있는 것입니다) -->
+<!-- BUILD-VERSION: 2026-08-30-v4 (이 줄이 안 보이면 예전 파일이 그대로 있는 것입니다) -->
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -117,7 +117,9 @@ h1,h2,h3{margin:0;}
 
 /* ===================== D-Day 카드 (라인 없이 배경 대비 + 볼드 숫자) ===================== */
 .dday-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(210px,1fr)); gap:1px; background:var(--gray-line);}
-.dday-card{background:var(--white); padding:16px;}
+.dday-card{background:var(--white); padding:16px; position:relative;}
+.dday-delete-btn{position:absolute; top:8px; right:8px; background:none; color:var(--gray-sub); font-size:13px; padding:2px 6px; line-height:1;}
+.dday-delete-btn:hover{color:var(--accent);}
 .dday-badge{display:block; font-size:22px; font-weight:800; letter-spacing:-.02em; margin-bottom:6px;}
 .dday-title-input{font-size:13.5px; font-weight:700; border:none; background:transparent; width:100%; padding:2px 0; margin-bottom:8px; color:var(--gray-text);}
 .dday-title-input:focus{outline:none; border-bottom:1px solid var(--accent);}
@@ -582,6 +584,11 @@ async function mockApi(action, payload) {
       if (ev) ev.title = payload.title;
       return ev;
     }
+    case 'deleteEvent': {
+      const idx = MOCK_DB.calendar.findIndex(e => e.event_id === payload.eventId);
+      if (idx > -1) MOCK_DB.calendar.splice(idx, 1);
+      return { eventId: payload.eventId, deleted: idx > -1 };
+    }
     case 'getArchiveList': return MOCK_DB.archive;
     case 'adminResendReminder': {
       const submitted = MOCK_DB.teams.filter(t => MOCK_DB.weekly[mockWeekId()+'_'+t.team_id]).map(t=>t.team_id);
@@ -697,7 +704,8 @@ async function gotoPage(pageId) {
 }
 
 /* ---------------- 공통: D-Day 렌더러 ---------------- */
-function renderDday(containerEl, events, editable) {
+// onDeleted: 삭제 성공 후 목록을 다시 불러오기 위한 콜백 (editable일 때만 사용)
+function renderDday(containerEl, events, editable, onDeleted) {
   if (!events.length) {
     containerEl.innerHTML = '<span style="font-size:12px;color:var(--gray-sub);">표시할 중장기 일정이 없습니다.</span>';
     return;
@@ -714,7 +722,11 @@ function renderDday(containerEl, events, editable) {
     const titleHtml = editable
       ? `<input class="dday-title-input" value="${ev.title.replace(/"/g,'&quot;')}" data-event-id="${ev.event_id}" onchange="onDdayTitleEdit(this)" />`
       : `<span class="dday-title-static">${ev.title}</span>`;
+    const deleteBtnHtml = editable
+      ? `<button class="dday-delete-btn" data-delete-id="${ev.event_id}" title="일정 삭제">✕</button>`
+      : '';
     return `<div class="dday-card">
+      ${deleteBtnHtml}
       <span class="dday-badge" style="color:${ddayColor};">${ddayLabel}</span>
       ${titleHtml}
       <div class="dday-meta">
@@ -724,6 +736,18 @@ function renderDday(containerEl, events, editable) {
       </div>
     </div>`;
   }).join('');
+
+  if (editable) {
+    containerEl.querySelectorAll('[data-delete-id]').forEach(btn => {
+      btn.onclick = async () => {
+        if (!confirm('이 일정을 삭제할까요? 되돌릴 수 없습니다.')) return;
+        try {
+          await api('deleteEvent', { eventId: btn.dataset.deleteId });
+          if (onDeleted) onDeleted();
+        } catch (err) { alert('삭제 중 오류가 발생했습니다: ' + err.message); }
+      };
+    });
+  }
 }
 async function onDdayTitleEdit(inputEl) {
   const eventId = inputEl.dataset.eventId;
@@ -887,7 +911,7 @@ document.getElementById('btnBackToTeams').onclick = () => { stopAutosave(); show
 
 async function loadTeamCalendar(teamId) {
   const events = await api('getCalendar', { teamId });
-  const fcEvents = events.map(ev => ({ title:ev.title, start:ev.start_date, end:ev.end_date,
+  const fcEvents = events.map(ev => ({ id: ev.event_id, title:ev.title, start:ev.start_date, end:ev.end_date,
     extendedProps:{ tag:ev.tag, description:ev.description } }));
   const el = document.getElementById('teamCalendarEl');
   if (teamCalendarInstance) teamCalendarInstance.destroy();
@@ -895,10 +919,19 @@ async function loadTeamCalendar(teamId) {
     initialView:'dayGridMonth', height:380,
     headerToolbar:{ left:'prev,next today', center:'title', right:'dayGridMonth,dayGridWeek' },
     events: fcEvents, dayCellClassNames, eventDidMount: styleEventEl,
-    eventClick:(info) => alert(`${info.event.title}\n태그: ${info.event.extendedProps.tag}\n${info.event.extendedProps.description||''}`)
+    eventClick: async (info) => {
+      const msg = `${info.event.title}\n태그: ${info.event.extendedProps.tag}\n${info.event.extendedProps.description||''}\n\n이 일정을 삭제하시겠습니까? (취소를 누르면 그냥 닫힙니다)`;
+      if (confirm(msg)) {
+        try {
+          await api('deleteEvent', { eventId: info.event.id });
+          loadTeamCalendar(STATE.writeTeamId);
+        } catch (err) { alert('삭제 중 오류가 발생했습니다: ' + err.message); }
+      }
+    }
   });
   teamCalendarInstance.render();
-  renderDday(document.getElementById('teamDdayEl'), events.filter(e => e.is_longterm), true);
+  renderDday(document.getElementById('teamDdayEl'), events.filter(e => e.is_longterm), true,
+    () => loadTeamCalendar(STATE.writeTeamId));
 }
 document.getElementById('btnAddEventTeam').onclick = () => addEventFlow(STATE.writeTeamId, () => loadTeamCalendar(STATE.writeTeamId));
 
